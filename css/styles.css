@@ -295,6 +295,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hero-slide.is-active { visibility: visible; z-index: 2; }
 .hero-slide img { object-position: center 35%; }
 
+/* Two-column hero: size by viewport height too, so the photo, slider
+   controls and headline all fit on short laptop screens (no scrolling). */
+@media (min-width: 961px) {
+  .hero { padding-top: clamp(1.5rem, 5vh, 4rem); padding-top: clamp(1.5rem, 5svh, 4rem); }
+  .hero-title {
+    font-size: clamp(2.6rem, min(4.6vw, 8.5vh), 4.6rem);
+    font-size: clamp(2.6rem, min(4.6vw, 8.5svh), 4.6rem);
+  }
+  /* photo height ≈ viewport − header − top padding − controls; width = height ÷ 1.15 */
+  .hero-media {
+    max-width: min(32rem, max(20rem, calc((100vh - var(--header-h) - 10rem) / 1.15)));
+    max-width: min(32rem, max(20rem, calc((100svh - var(--header-h) - 10rem) / 1.15)));
+  }
+}
+
 .slider-controls {
   display: flex;
   align-items: center;
