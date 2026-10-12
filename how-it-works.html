@@ -21,6 +21,9 @@
   <!-- Icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v11a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
       <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
       <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
       <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M15 3h3v4h-3a1 1 0 0 0-1 1v3h4l-1 4h-3v7h-4v-7H7v-4h3V8a5 5 0 0 1 5-5z"/></symbol>
@@ -48,10 +51,10 @@
           <li><a href="about.html">About Us</a></li>
           <li><a href="careers.html">Careers</a></li>
         </ul>
-        <a class="btn btn-primary nav-cta-mobile" href="index.html#contact">Book a Free Assessment</a>
+        <a class="btn btn-primary nav-cta-mobile" href="#contact">Book a Free Assessment</a>
       </nav>
 
-      <a class="btn btn-primary header-cta" href="index.html#contact">Book a Free Assessment</a>
+      <a class="btn btn-primary header-cta" href="#contact">Book a Free Assessment</a>
 
       <button class="menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Open menu" data-menu-toggle>
         <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"/></svg>
@@ -65,11 +68,18 @@
     <!-- ============ INTRO ============ -->
     <section class="hiw-intro">
       <div class="container">
-        <header data-reveal-group>
-          <p class="eyebrow" data-split>How it works</p>
-          <h1 class="page-title" data-split>From first call to real progress</h1>
-          <p class="section-sub" data-split>Getting started takes three simple steps. Here’s exactly what to expect.</p>
+        <header class="hiw-intro-head" data-reveal-group>
+          <div>
+            <p class="eyebrow" data-split>How it works</p>
+            <h1 class="page-title" data-split>From first call to real progress</h1>
+          </div>
+          <p class="section-sub" data-split>Getting started takes three simple steps.<br> Here’s exactly what to expect.</p>
         </header>
+
+        <!-- The photo drifts inside its frame while scrolling (main.js, "Parallax photo") -->
+        <figure class="hiw-photo media" data-parallax data-placeholder="assets/images/how-it-works.jpg">
+          <img src="assets/images/how-it-works.jpg" alt="Three Mindset2Learn tutors smiling behind their information table at a community event in a park" width="2000" height="1500">
+        </figure>
       </div>
     </section>
 
@@ -105,6 +115,249 @@
             <li data-split>Plans adjust as your child grows</li>
           </ul>
         </article>
+      </div>
+    </section>
+
+    <!-- ============ WHERE WE TUTOR ============ -->
+    <section class="section section--gray" id="where">
+      <div class="container">
+        <header class="section-head section-head--center" data-reveal-group>
+          <p class="eyebrow" data-split>Where we tutor</p>
+          <h2 class="section-title" data-split>Learning that comes to you</h2>
+          <p class="section-sub" data-split>Your tutor meets your child where they’re most comfortable.</p>
+        </header>
+
+        <div class="where-grid">
+          <article class="card where-card">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-home"/></svg></span>
+            <h3 class="card-title">In person</h3>
+            <p class="card-text">Your tutor comes to you, so your child learns somewhere familiar.</p>
+            <ul class="hiw-bullets">
+              <li>At home or a spot you choose, like a library</li>
+              <li>Hands-on help with real homework</li>
+              <li>Great for younger students</li>
+            </ul>
+            <ul class="tags">
+              <li>Northern Virginia</li><li>Maryland</li><li>DC</li>
+            </ul>
+          </article>
+
+          <article class="card where-card">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span>
+            <h3 class="card-title">Online</h3>
+            <p class="card-text">Live one-on-one video sessions, just as personal as in person.</p>
+            <ul class="hiw-bullets">
+              <li>Shared whiteboard and screen</li>
+              <li>Easy to fit into busy schedules</li>
+              <li>Same tutors, same approach</li>
+            </ul>
+            <ul class="tags">
+              <li>Anywhere available</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section class="section" id="faq">
+      <div class="container faq-grid">
+        <header class="faq-head" data-reveal-group>
+          <p class="eyebrow" data-split>FAQ</p>
+          <h2 class="section-title" data-split>Frequently asked questions</h2>
+          <p class="section-sub" data-split>Still have questions? Call us at <a class="plain-link" href="tel:+15718992687">(571) 899-2687</a></p>
+        </header>
+
+        <div class="faq-list" data-faq>
+          <div class="faq-item is-open">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="true" aria-controls="faq-a1" id="faq-q1">
+                <span>1. How much does tutoring cost?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a1" role="region" aria-labelledby="faq-q1">
+              <div class="faq-a-inner"><p>Rates depend on your location, whether sessions are in person or online, and how many sessions per week your child needs. Book a free assessment and we’ll give you an exact rate, no pressure.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a2" id="faq-q2">
+                <span>2. Is the assessment really free?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a2" role="region" aria-labelledby="faq-q2">
+              <div class="faq-a-inner"><p>Yes. It’s a no-cost, no-commitment session where we get to know your child, find their strengths and gaps, and talk about your goals.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a3" id="faq-q3">
+                <span>3. What happens during the free assessment?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a3" role="region" aria-labelledby="faq-q3">
+              <div class="faq-a-inner"><p>It takes about 30–45 minutes, in person or online. We work with your child to see where they’re strong and where they need support, then talk through your goals as a family. You’ll leave with a clear picture of where your child stands.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a4" id="faq-q4">
+                <span>4. How do you choose my child’s tutor?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a4" role="region" aria-labelledby="faq-q4">
+              <div class="faq-a-inner"><p>After the assessment, we match your child with a tutor who fits their needs, learning style, and your family’s schedule. That tutor then builds a personalized plan with clear goals and milestones.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a5" id="faq-q5">
+                <span>5. Do you offer online or in-person tutoring?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a5" role="region" aria-labelledby="faq-q5">
+              <div class="faq-a-inner"><p>Both. Choose whichever fits your family’s schedule, or mix the two.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a6" id="faq-q6">
+                <span>6. Where do in-person sessions take place?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a6" role="region" aria-labelledby="faq-q6">
+              <div class="faq-a-inner"><p>Wherever your child is most comfortable. Most families have the tutor come to their home, but we can also meet at another spot you choose, like a local library.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a7" id="faq-q7">
+                <span>7. What grades and subjects do you cover?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a7" role="region" aria-labelledby="faq-q7">
+              <div class="faq-a-inner"><p>All K-12 core subjects, including math, reading, writing, science, and social studies, plus test prep for the SOLs, SAT, and ACT. We also coach executive functioning and social-emotional skills.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a8" id="faq-q8">
+                <span>8. Can you help if my child has ADHD or a learning difference?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a8" role="region" aria-labelledby="faq-q8">
+              <div class="faq-a-inner"><p>Yes, it’s one of our specialties. Our founder has 15+ years as a special education teacher, and we regularly work with students with ADHD, dyslexia, and other learning differences.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a9" id="faq-q9">
+                <span>9. How often should my child meet with a tutor?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a9" role="region" aria-labelledby="faq-q9">
+              <div class="faq-a-inner"><p>Most students meet once or twice a week. After the assessment, we’ll recommend a schedule based on your child’s goals.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a10" id="faq-q10">
+                <span>10. Do you have weekend sessions?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a10" role="region" aria-labelledby="faq-q10">
+              <div class="faq-a-inner"><p>Yes. We offer flexible time slots on both weekdays and weekends, so sessions can fit around school, activities, and work.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a11" id="faq-q11">
+                <span>11. How will I know if tutoring is working?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a11" role="region" aria-labelledby="faq-q11">
+              <div class="faq-a-inner"><p>Your tutor keeps you updated on what your child is working on and how they’re progressing, so you’re never guessing.</p></div>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <h3 class="faq-q">
+              <button type="button" aria-expanded="false" aria-controls="faq-a12" id="faq-q12">
+                <span>12. What if my child’s needs change?</span>
+                <svg class="icon faq-icon" aria-hidden="true"><use href="#i-plus"/></svg>
+              </button>
+            </h3>
+            <div class="faq-a" id="faq-a12" role="region" aria-labelledby="faq-q12">
+              <div class="faq-a-inner"><p>The plan changes with them. As your child reaches goals or school brings new challenges, your tutor adjusts what you work on and how often you meet.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GET STARTED ============ -->
+    <section class="section section--tight" id="contact">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-copy" data-reveal-group>
+            <p class="eyebrow" data-split>Get started</p>
+            <h2 class="section-title" data-split>Ready to see what your child can do?</h2>
+            <p class="section-sub" data-split>Book a free assessment. We’ll get to know your child, find where they need support, and build a plan together. No cost, no commitment.</p>
+          </div>
+
+          <!-- TODO: point action at your form handler (e.g. Formspree, Netlify Forms, or your own endpoint) -->
+          <form class="cta-form" data-form data-success="Thanks! We’ll be in touch shortly to schedule your free assessment." action="#" method="post" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="first-name">First Name<span class="req" aria-hidden="true">*</span></label>
+                <input id="first-name" name="first_name" type="text" placeholder="Type Here" autocomplete="given-name" required>
+              </div>
+              <div class="field">
+                <label for="last-name">Last Name<span class="req" aria-hidden="true">*</span></label>
+                <input id="last-name" name="last_name" type="text" placeholder="Type Here" autocomplete="family-name" required>
+              </div>
+            </div>
+            <div class="field">
+              <label for="email">Email Address<span class="req" aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" placeholder="Type Here" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="address">Home Address</label>
+              <input id="address" name="address" type="text" placeholder="Type Here" autocomplete="street-address">
+            </div>
+            <div class="field">
+              <label for="phone">Phone Number<span class="req" aria-hidden="true">*</span></label>
+              <input id="phone" name="phone" type="tel" placeholder="Type Here" autocomplete="tel" required>
+            </div>
+            <div class="field">
+              <label for="message">Questions or Comments</label>
+              <textarea id="message" name="message" rows="1" placeholder="Type Here"></textarea>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Book a Free Assessment</button>
+            <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+          </form>
+        </div>
       </div>
     </section>
   </main>
@@ -146,7 +399,7 @@
             <li><a href="how-it-works.html">How It Works</a></li>
             <li><a href="about.html">About Us</a></li>
             <li><a href="careers.html">Careers</a></li>
-            <li><a href="index.html#contact">Book an Assessment</a></li>
+            <li><a href="#contact">Book an Assessment</a></li>
           </ul>
         </nav>
 

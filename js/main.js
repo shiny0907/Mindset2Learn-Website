@@ -288,6 +288,36 @@
   });
 
   /* ---------------------------------------------------------
+     Parallax photo: the image is taller than its frame and
+     drifts down through it as the frame scrolls up the screen,
+     so it moves a little slower than the page
+     --------------------------------------------------------- */
+  const parallaxFrames = [...document.querySelectorAll('[data-parallax]')];
+  if (parallaxFrames.length && !reduceMotion) {
+    let ticking = false;
+    const updateParallax = () => {
+      ticking = false;
+      const vh = window.innerHeight;
+      parallaxFrames.forEach((frame) => {
+        const r = frame.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        const img = frame.querySelector('img');
+        const extra = img.offsetHeight - frame.offsetHeight; // room to move
+        const progress = (vh - r.top) / (vh + r.height);     // 0 = entering at the bottom, 1 = leaving at the top
+        img.style.transform = `translate3d(0, ${((progress - 0.5) * extra).toFixed(1)}px, 0)`;
+      });
+    };
+    const requestParallax = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(updateParallax);
+    };
+    window.addEventListener('scroll', requestParallax, { passive: true });
+    window.addEventListener('resize', requestParallax);
+    updateParallax();
+  }
+
+  /* ---------------------------------------------------------
      Scroll reveal
      --------------------------------------------------------- */
   // Footer year (set before any text is split)

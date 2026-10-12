@@ -1215,7 +1215,58 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
    How it works page
    ========================================================= */
 .hiw-intro { padding-top: var(--page-top); }
-.hiw { padding-block: clamp(4rem, 8vw, 7rem) calc(var(--section-y) * 2); }
+/* Title on the left, intro line on the right, sharing a baseline */
+.hiw-intro-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem 2rem;
+}
+.hiw-intro-head .section-sub { margin-top: 0; text-align: right; }
+/* Wide photo band. The image is taller than its frame and drifts
+   through it while scrolling (main.js, "Parallax photo"). */
+.hiw-photo {
+  aspect-ratio: 16 / 10;
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+.media.hiw-photo img {
+  position: absolute;
+  top: -25%;
+  left: 0;
+  height: 150%;
+  object-position: center 8%;
+  will-change: transform;
+}
+/* Desktop: heading + photo fill the first screen and sit just above its
+   bottom edge. The photo is a 3.2:1 band, but gives up height on shorter
+   laptop screens; on tall monitors the spare room goes above the heading. */
+@media (min-width: 961px) {
+  .hiw-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: calc(100vh - var(--header-h) - 2rem);
+    min-height: calc(100svh - var(--header-h) - 2rem);
+    padding-top: min(var(--page-top), 7vh);
+    padding-top: min(var(--page-top), 7svh);
+  }
+  .hiw-intro .container {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - var(--header-h) - min(var(--page-top), 7vh) - 2rem);
+    max-height: calc(100svh - var(--header-h) - min(var(--page-top), 7svh) - 2rem);
+  }
+  .hiw-intro-head { flex-shrink: 0; }
+  .hiw-photo {
+    aspect-ratio: auto;
+    flex: 0 1 calc(100cqi / 3.2);
+    min-height: 16rem;
+  }
+}
+.hiw { padding-block: calc(var(--section-y) * 1.4) var(--section-y); }
 .hiw-steps { position: relative; display: grid; gap: clamp(13rem, 23vw, 21rem); }
 /* Smooth dashed line behind the steps (path data comes from js) */
 .hiw-path {
@@ -1268,6 +1319,24 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   background: var(--orange);
   vertical-align: 0.2em;
 }
+
+/* Where we tutor */
+.where-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+.where-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2rem 1.75rem 1.75rem;
+}
+.where-card .pillar-icon { margin-bottom: 1.5rem; }
+.where-card .card-title { margin-bottom: 0.5rem; }
+.where-card .card-text { max-width: 24rem; }
+/* tags sit along the bottom, level across both cards */
+.where-card .tags { margin-top: auto; padding-top: 2rem; }
 
 /* =========================================================
    Responsive
@@ -1365,6 +1434,10 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .hiw-step--two .hiw-step-text { margin-left: 0; }
   .hiw-step--two .hiw-bullets { padding-left: 1.1rem; list-style: disc; }
   .hiw-step--two .hiw-bullets li::after { content: none; }
+  .hiw-intro-head { flex-direction: column; align-items: flex-start; }
+  .hiw-intro-head .section-sub { text-align: left; }
+  .hiw-intro-head .section-sub br { display: none; }
+  .where-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {
