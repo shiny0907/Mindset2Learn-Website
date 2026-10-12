@@ -909,6 +909,8 @@ main {
   white-space: nowrap;
   animation: philosophy-drift 90s linear infinite;
 }
+/* Keep each span's trailing space, which flex items otherwise trim */
+.philosophy-row span { white-space: pre; }
 .philosophy-row:nth-child(2) { margin-left: -12rem; }
 .philosophy-row--reverse { animation-direction: reverse; }
 @keyframes philosophy-drift { to { transform: translateX(-50%); } }
@@ -942,18 +944,31 @@ main {
 }
 .beliefs-list .pillar-text { max-width: none; }
 
-/* Leadership */
+/* Tutors */
 .team-card {
-  padding: clamp(2.5rem, 5vw, 4.5rem) clamp(1.5rem, 4vw, 4rem) clamp(1.75rem, 3vw, 2.5rem);
+  --team-pad: clamp(1.5rem, 4vw, 4rem);
+  padding: clamp(2.5rem, 5vw, 4.5rem) var(--team-pad) clamp(1.75rem, 3vw, 2.5rem);
   border-radius: calc(var(--radius-lg) + 0.5rem);
   background: var(--bg-gray);
 }
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+/* Strip runs to the card's edges; drifts sideways and can be dragged (js) */
+.team-marquee {
+  margin-inline: calc(-1 * var(--team-pad));
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y; /* vertical swipes still scroll the page */
+  user-select: none;
 }
-.team-member { text-align: center; }
+.team-marquee.is-dragging { cursor: grabbing; }
+.team-grid {
+  display: flex;
+  gap: clamp(1.25rem, 2.5vw, 2.25rem);
+  width: max-content;
+  padding-inline: var(--team-pad);
+  will-change: transform;
+}
+.team-member { flex: 0 0 clamp(14rem, 22vw, 18.5rem); text-align: center; }
+.team-photo img { -webkit-user-drag: none; pointer-events: none; }
 .team-photo {
   aspect-ratio: 3 / 4;
   border-radius: var(--radius-lg);
@@ -967,6 +982,64 @@ main {
 }
 .team-role { margin-top: 0.2rem; color: var(--orange); font-size: 1.0625rem; font-weight: 600; }
 .team-cta { margin-top: clamp(4.5rem, 7.5vw, 6.5rem); text-align: center; }
+
+/* Closing call to action */
+.about-cta { margin-bottom: 0; }
+.about-cta .section-sub { max-width: 30rem; }
+.about-cta-action { margin-top: 2rem; text-align: center; }
+
+/* =========================================================
+   Careers page
+   ========================================================= */
+.careers {
+  min-height: 70vh;
+  padding-block: clamp(2.5rem, 5vw, 4.5rem) var(--section-y);
+}
+.careers-title {
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.25rem, 3.6vw, 3.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+.job-list {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+.job-card {
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--bg-gray);
+  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.3s, background-color 0.3s;
+}
+.job-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--peach-line);
+  background: var(--peach);
+  box-shadow: var(--shadow);
+}
+.job-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: color 0.3s;
+}
+.job-card:hover .job-title { color: var(--orange); }
+.job-text { max-width: 44rem; margin-top: 0.85rem; color: var(--muted); }
+.job-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+.job-meta .icon { width: 1.1rem; height: 1.1rem; }
+.job-card .btn, .job-card .pop-mask { margin-top: 1.5rem; }
+.job-card .pop-mask .btn { margin-top: 0; }
 
 /* =========================================================
    Responsive
@@ -1051,14 +1124,12 @@ main {
   .founder-media { max-width: 26rem; }
   .beliefs-grid { grid-template-columns: 1fr; }
   .beliefs-list { justify-self: start; }
-  .team-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 560px) {
-  .team-grid { grid-template-columns: 1fr; max-width: 22rem; }
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .hero-title br { display: none; }
+  .hero-title br, .about-cta br { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -149,6 +149,122 @@
   updateSpy();
 
   /* ---------------------------------------------------------
+     Tutors strip: stays still until the visitor reaches it, then
+     drifts sideways in an endless loop; can be dragged or flicked
+     --------------------------------------------------------- */
+  const marquee = document.querySelector('[data-team-marquee]');
+  if (marquee) {
+    const track = marquee.querySelector('.team-grid');
+    const originals = [...track.children];
+    // A second copy follows the first so the loop never shows a seam
+    originals.forEach((li) => {
+      const copy = li.cloneNode(true);
+      copy.setAttribute('aria-hidden', 'true');
+      track.appendChild(copy);
+    });
+
+    const SPEED = 45;       // drift in px per second
+    const FRICTION = 0.94;  // how quickly a flick slows down (per frame)
+    let loopW = 0;          // width of one full set of cards
+    let pos = 0;
+    let vel = 0;            // px per frame, left over from a flick
+    let started = false;
+    let drag = null;
+    let raf = 0;
+    let last = null;
+
+    const measure = () => {
+      loopW = track.children[originals.length].offsetLeft - originals[0].offsetLeft;
+    };
+    const render = () => {
+      if (loopW) pos = ((pos % loopW) + loopW) % loopW;
+      track.style.transform = `translate3d(${-pos}px, 0, 0)`;
+    };
+
+    const tick = (time) => {
+      const dt = last === null ? 0 : Math.min(0.05, (time - last) / 1000);
+      last = time;
+      if (!drag) {
+        if (Math.abs(vel) > 0.05) {
+          pos += vel;
+          vel *= FRICTION;
+        } else vel = 0;
+        if (started && !reduceMotion) pos += SPEED * dt;
+        render();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    const play = () => {
+      if (raf) return;
+      last = null;
+      raf = requestAnimationFrame(tick);
+    };
+    const pause = () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+
+    measure();
+    render();
+    window.addEventListener('resize', () => { measure(); render(); });
+
+    // Starts once a good part of the strip is on screen; idles when it's gone
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(
+        ([entry]) => {
+          if (entry.intersectionRatio >= 0.4) {
+            started = true;
+            play();
+          } else if (!entry.isIntersecting) pause();
+        },
+        { threshold: [0, 0.4] }
+      ).observe(marquee);
+    } else {
+      started = true;
+      play();
+    }
+
+    marquee.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      drag = { x: e.clientX, t: e.timeStamp };
+      vel = 0;
+      marquee.setPointerCapture(e.pointerId);
+      marquee.classList.add('is-dragging');
+      play();
+    });
+    marquee.addEventListener('pointermove', (e) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      const dt = Math.max(1, e.timeStamp - drag.t);
+      pos -= dx;
+      vel = Math.max(-60, Math.min(60, (-dx / dt) * 16));
+      drag.x = e.clientX;
+      drag.t = e.timeStamp;
+      render();
+    });
+    const endDrag = (e) => {
+      if (!drag) return;
+      if (e.timeStamp - drag.t > 80) vel = 0; // held still before letting go: no flick
+      drag = null;
+      marquee.classList.remove('is-dragging');
+    };
+    marquee.addEventListener('pointerup', endDrag);
+    marquee.addEventListener('pointercancel', endDrag);
+
+    // Sideways trackpad swipes move it too
+    marquee.addEventListener(
+      'wheel',
+      (e) => {
+        if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+        e.preventDefault();
+        pos += e.deltaX;
+        render();
+      },
+      { passive: false }
+    );
+  }
+
+  /* ---------------------------------------------------------
      Image placeholders (until real photos are added)
      --------------------------------------------------------- */
   document.querySelectorAll('.media img').forEach((img) => {
