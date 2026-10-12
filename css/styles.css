@@ -187,6 +187,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn-primary:hover {
   background: var(--orange-dark);
 }
+/* Secondary: quiet gray pill (arrow nudges right on hover) */
+.btn-secondary {
+  background: var(--bg-gray-dark);
+  color: var(--ink);
+}
+.btn-secondary:hover { background: #E2DFD1; }
+.btn-secondary .icon { width: 1rem; height: 1rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
+.btn-secondary:hover .icon { transform: translateX(3px); }
 .btn-lg { padding: 1rem 1.9rem; font-size: 1rem; }
 .btn-block { width: 100%; padding-block: 1rem; }
 
@@ -298,6 +306,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   font-size: 1.0625rem;
 }
 
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 .hero-media { justify-self: end; width: 100%; max-width: 32rem; }
 .hero-slides {
   position: relative;
@@ -448,7 +457,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   font-weight: 600;
 }
 .text-link .icon { width: 1rem; height: 1rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
-.text-link:hover .icon { transform: translate(3px, -3px); }
+.text-link:hover .icon { transform: translateX(3px); }
 
 .wide-card {
   display: grid;
@@ -693,7 +702,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   resize: vertical;
   transition: border-color var(--dur);
 }
-.field textarea { min-height: 2.6rem; }
+/* a little taller than one line, so zoom rounding never shows scroll arrows */
+.field textarea { min-height: 3rem; }
 .field input::placeholder,
 .field textarea::placeholder { color: var(--placeholder); }
 .field input:focus,
@@ -702,6 +712,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .field-error { font-size: 0.8rem; color: var(--error); }
 .cta-form .btn-block, .apply-form .btn-block { margin-top: 0.75rem; }
 .form-status { min-height: 1.5em; font-size: 0.9375rem; font-weight: 500; text-align: center; color: var(--success); }
+/* Assessment form: the button is the last thing in the panel, level with its
+   top padding; the thank-you message shows in the padding below it */
+.cta-form { position: relative; }
+.cta-form .form-status { position: absolute; top: 100%; left: 0; right: 0; margin-top: 1rem; }
 
 /* ---------- Footer ---------- */
 /* Page content sits above the footer; its bottom corners round as the
