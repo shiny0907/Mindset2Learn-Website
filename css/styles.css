@@ -1035,14 +1035,15 @@ main {
   min-height: 100vh;
   padding-block: var(--page-top) calc(var(--section-y) * 4);
 }
-.careers-title {
-  max-width: 14ch;
+/* Page heading (h1) on inner pages */
+.page-title {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: clamp(2.25rem, 3.6vw, 3.25rem);
   line-height: 1.1;
   letter-spacing: -0.025em;
 }
+.page-title--narrow { max-width: 14ch; }
 .job-list {
   display: grid;
   gap: 1.25rem;
@@ -1211,6 +1212,64 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
 .field.has-error .dropzone { border-color: var(--error); }
 
 /* =========================================================
+   How it works page
+   ========================================================= */
+.hiw-intro { padding-top: var(--page-top); }
+.hiw { padding-block: clamp(4rem, 8vw, 7rem) calc(var(--section-y) * 2); }
+.hiw-steps { position: relative; display: grid; gap: clamp(13rem, 23vw, 21rem); }
+/* Smooth dashed line behind the steps (path data comes from js) */
+.hiw-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.hiw-line {
+  fill: none;
+  stroke: var(--orange);
+  stroke-width: 5;
+  stroke-linecap: round; /* dash pattern is set by js as the line draws */
+}
+.hiw-step { position: relative; z-index: 1; }
+.hiw-step--one { margin-left: 4%; }
+.hiw-step--two { justify-self: end; text-align: right; }
+.hiw-step--three { margin-left: 17%; }
+.hiw-step-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.2vw, 2.9rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  white-space: nowrap; /* one line each, so the path can meet them */
+}
+.hiw-num { color: var(--orange); }
+.hiw-step-text { max-width: 28rem; margin-top: 0.75rem; color: var(--muted); text-wrap: balance; }
+.hiw-step--two .hiw-step-text { margin-left: auto; }
+.hiw-bullets {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.85rem;
+  padding-left: 1.1rem;
+  list-style: disc;
+  color: var(--muted);
+}
+.hiw-bullets li::marker { color: var(--orange); }
+/* Right-hand step: mirrored list, right-aligned with the bullets on the right */
+.hiw-step--two .hiw-bullets { padding-left: 0; list-style: none; }
+.hiw-step--two .hiw-bullets li::after {
+  content: "";
+  display: inline-block;
+  width: 0.34rem;
+  height: 0.34rem;
+  margin-left: 0.75rem;
+  border-radius: 50%;
+  background: var(--orange);
+  vertical-align: 0.2em;
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 
@@ -1297,6 +1356,15 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .beliefs-grid { grid-template-columns: 1fr; }
   .beliefs-list { justify-self: start; }
   .apply-grid { grid-template-columns: 1fr; }
+  /* Stacked steps: no drawn line, everything left-aligned */
+  .hiw-path { display: none; }
+  .hiw-steps { gap: clamp(3.5rem, 10vw, 5rem); }
+  .hiw-step--one, .hiw-step--three { margin-left: 0; }
+  .hiw-step--two { justify-self: start; text-align: left; }
+  .hiw-step-title { white-space: normal; }
+  .hiw-step--two .hiw-step-text { margin-left: 0; }
+  .hiw-step--two .hiw-bullets { padding-left: 1.1rem; list-style: disc; }
+  .hiw-step--two .hiw-bullets li::after { content: none; }
 }
 
 @media (max-width: 560px) {

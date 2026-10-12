@@ -435,6 +435,7 @@
     // Anything on screen at load (even near the bottom edge) plays its full
     // entrance right away; the rest waits until it's scrolled into view.
     revealEls.forEach((el) => {
+      if (el.closest('[data-step]')) return; // How it works steps appear with their line (below)
       const target = el.classList.contains('pop-ready') ? el.parentElement : el;
       const r = target.getBoundingClientRect();
       if (r.top < window.innerHeight && r.bottom > 0) reveal(el);
@@ -442,12 +443,222 @@
     });
   };
 
-  if (canAnimate) {
-    // Wait for the web fonts so line breaks are measured with the real typeface
-    const fontsReady = document.fonts ? document.fonts.ready : Promise.resolve();
-    Promise.race([fontsReady, new Promise((r) => setTimeout(r, 1500))]).then(startReveal);
-  } else {
-    revealEls.forEach((el) => el.classList.add('is-visible'));
+  // Wait for the web fonts so line breaks are measured with the real typeface
+  const fontsReady = Promise.race([
+    document.fonts ? document.fonts.ready : Promise.resolve(),
+    new Promise((r) => setTimeout(r, 1500)),
+  ]);
+  if (canAnimate) fontsReady.then(startReveal);
+  else revealEls.forEach((el) => el.classList.add('is-visible'));
+
+  /* ---------------------------------------------------------
+     How it works path: a smooth dashed line runs from step to
+     step and draws itself as the visitor scrolls; each step
+     appears when the line reaches it
+     --------------------------------------------------------- */
+  const hiw = document.querySelector('[data-hiw]');
+  if (hiw) {
+    const svg = hiw.querySelector('[data-hiw-svg]');
+    const steps = [...hiw.querySelectorAll('[data-step]')];
+    const titles = steps.map((s) => s.querySelector('.hiw-step-title'));
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const PEN_AT = 0.85;   // the line is drawn down to this height of the screen
+    const EASE = 0.14;     // how quickly the drawn line catches up (per frame)
+    const MIN_STEP = 6;    // ...but never slower than this (px per frame), so it doesn't crawl at the end
+    const ARRIVED = 24;    // px from a route's end that counts as reaching the next step
+
+    // Each route's shape, traced from the design: given its start a, end b and
+    // the steps' width W, returns the points the line passes through between
+    // them. Loops are sized from the width, not the height, so the gap between
+    // steps can grow without stretching them.
+    const ROUTES = [
+      // 01 → 02: out to the right, a round loop, then down onto step 2's title
+      (a, b) => {
+        const sx = b[0] - a[0];
+        const sy = b[1] - a[1];
+        const at = (u, v) => [a[0] + u * sx, a[1] + v * sy];
+        const c = at(0.6, 0.42); // loop centre
+        const r = Math.min(sx * 0.13, sy * 0.22);
+        const around = (dx, dy) => [c[0] + dx * r, c[1] + dy * r];
+        // The line comes down onto the circle's right side, goes clockwise all
+        // the way round to the top (y points down), then leaves to the right,
+        // crossing the way it came in at close to a right angle.
+        const loop = [];
+        for (let deg = 0; deg <= 270; deg += 30) {
+          const rad = (deg * Math.PI) / 180;
+          loop.push(around(Math.cos(rad), Math.sin(rad)));
+        }
+        return [around(-1.6, -3.3), around(0.35, -2.6), around(0.95, -1.3), ...loop, around(1.7, -0.75), at(0.97, 0.55), at(1, 0.82)];
+      },
+      // 02 → 03: left and up into a heart-shaped loop, then down onto step 3's title
+      (a, b, W) => {
+        const span = b[1] - a[1];
+        const heart = Math.min(span, W * 0.29); // height unit for the heart
+        const lift = 0.6;                          // how far it rises above the start
+        const inHeart = [[0.475, 0.08], [0.411, 0.14], [0.379, 0.05], [0.375, -0.19], [0.382, -0.44], [0.346, -0.57],
+          [0.314, -0.58], [0.282, -0.48], [0.269, -0.26], [0.217, -0.2], [0.152, -0.21], [0.101, -0.12], [0.081, 0.08],
+          [0.101, 0.28]];
+        const toStep3 = [[0.152, 0.36], [0.256, 0.48], [0.327, 0.63], [0.359, 0.81]];
+        return [
+          ...inHeart.map(([u, v]) => [u * W, a[1] + v * heart * (v < 0 ? lift : 1)]),
+          ...toStep3.map(([u, v]) => [u * W, a[1] + v * span]),
+        ];
+      },
+    ];
+
+    // Title box relative to the steps container. Left/right come from the text
+    // itself (titles are blocks); top/bottom from the block, which never moves.
+    const titleBox = (title) => {
+      const base = hiw.getBoundingClientRect();
+      const block = title.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const text = range.getBoundingClientRect();
+      return {
+        left: text.left - base.left,
+        right: text.right - base.left,
+        width: text.width,
+        top: block.top - base.top,
+        bottom: block.bottom - base.top,
+      };
+    };
+
+    // Smooth curve through the points: centripetal Catmull-Rom, converted to
+    // cubic Béziers. Unlike the plain version it never kinks or overshoots
+    // where points are unevenly spaced.
+    const smoothPath = (pts) => {
+      const f = (p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`;
+      const dist = (p, q) => Math.sqrt(Math.hypot(q[0] - p[0], q[1] - p[1])); // |pq|^0.5
+      let d = `M${f(pts[0])}`;
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i - 1] || pts[i];
+        const p1 = pts[i];
+        const p2 = pts[i + 1];
+        const p3 = pts[i + 2] || p2;
+        const d1 = dist(p0, p1);
+        const d2 = dist(p1, p2);
+        const d3 = dist(p2, p3);
+        const c1 = d1 < 1e-6 ? p1 : [0, 1].map((k) =>
+          (d1 * d1 * p2[k] - d2 * d2 * p0[k] + (2 * d1 * d1 + 3 * d1 * d2 + d2 * d2) * p1[k]) / (3 * d1 * (d1 + d2)));
+        const c2 = d3 < 1e-6 ? p2 : [0, 1].map((k) =>
+          (d3 * d3 * p1[k] - d2 * d2 * p3[k] + (2 * d3 * d3 + 3 * d3 * d2 + d2 * d2) * p2[k]) / (3 * d3 * (d3 + d2)));
+        d += ` C${f(c1)} ${f(c2)} ${f(p2)}`;
+      }
+      return d;
+    };
+
+    let segs = [];
+
+    // Shows the first `drawn` px of a route as dashes. The cut-off is by
+    // distance along the line (not by area), so where the line crosses itself
+    // nothing ahead of the pen can show through.
+    const DASH = 14;
+    const GAP = 13;
+    function paint(seg) {
+      const { line, len, drawn } = seg;
+      if (drawn < 1) {
+        line.style.visibility = 'hidden';
+        return;
+      }
+      line.style.visibility = '';
+      const pattern = [];
+      let at = 0;
+      while (at + DASH < drawn) {
+        pattern.push(DASH, GAP);
+        at += DASH + GAP;
+      }
+      if (drawn > at) pattern.push(drawn - at, len);
+      else pattern[pattern.length - 1] = len; // ends on a gap: hide the rest
+      line.style.strokeDasharray = pattern.join(' ');
+    }
+
+    function build() {
+      const W = hiw.clientWidth;
+      const H = hiw.clientHeight;
+      const [t1, t2, t3] = titles.map(titleBox);
+      const ends = [
+        [[t1.right + W * 0.02, t1.bottom + 12], [t2.left + t2.width * 0.72, t2.top - 18]],
+        [[t2.left + t2.width * 0.13, t2.bottom + 30], [t3.left + t3.width * 0.42, t3.top - 18]],
+      ];
+      const previous = segs.map((s) => (s.len ? s.drawn / s.len : 0));
+
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      svg.replaceChildren();
+      segs = ROUTES.map((route, k) => {
+        const [a, b] = ends[k];
+        const pts = [a, ...route(a, b, W), b];
+        const d = smoothPath(pts);
+
+        const line = document.createElementNS(SVG_NS, 'path');
+        line.setAttribute('d', d);
+        line.setAttribute('class', 'hiw-line');
+        svg.append(line);
+
+        const len = line.getTotalLength();
+        const samples = [];
+        for (let l = 0; l <= len; l += 6) samples.push({ len: l, y: line.getPointAtLength(l).y });
+        const seg = { line, len, samples, drawn: reduceMotion ? len : (previous[k] || 0) * len };
+        seg.target = seg.drawn;
+        paint(seg);
+        return seg;
+      });
+    }
+
+    // Each route draws down to the "pen" line on screen, one after the other
+    function updateTargets() {
+      const penY = window.innerHeight * PEN_AT - hiw.getBoundingClientRect().top;
+      let prevDone = true;
+      segs.forEach((seg) => {
+        if (reduceMotion) seg.target = seg.len;
+        else if (!prevDone) seg.target = 0;
+        else {
+          const past = seg.samples.find((s) => s.y > penY);
+          seg.target = past ? past.len : seg.len;
+        }
+        prevDone = seg.drawn >= seg.len - ARRIVED;
+      });
+    }
+
+    const shown = new Set();
+    function showStep(step) {
+      if (shown.has(step)) return;
+      shown.add(step);
+      if (!canAnimate) return; // already visible
+      step.querySelectorAll('[data-split]').forEach((el, i) => {
+        el.style.setProperty('--reveal-delay', `${(i * 0.08).toFixed(2)}s`);
+        reveal(el);
+      });
+    }
+    function updateSteps() {
+      const lineShown = getComputedStyle(svg).display !== 'none';
+      steps.forEach((step, i) => {
+        const reached = lineShown && i > 0
+          ? segs[i - 1].drawn >= segs[i - 1].len - ARRIVED
+          : step.getBoundingClientRect().top < window.innerHeight * 0.9;
+        if (reached) showStep(step);
+      });
+    }
+
+    let raf = 0;
+    function frame() {
+      raf = 0;
+      updateTargets();
+      segs.forEach((seg) => {
+        const diff = seg.target - seg.drawn;
+        const move = Math.max(Math.abs(diff) * EASE, MIN_STEP);
+        seg.drawn = Math.abs(diff) <= move ? seg.target : seg.drawn + Math.sign(diff) * move;
+        paint(seg);
+      });
+      updateSteps();
+      updateTargets(); // a finished route lets the next one start
+      if (segs.some((seg) => seg.drawn !== seg.target)) raf = requestAnimationFrame(frame);
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(frame); };
+
+    build();
+    fontsReady.then(() => { build(); kick(); });
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', () => { build(); kick(); });
   }
 
   /* ---------------------------------------------------------
