@@ -292,12 +292,6 @@
   document.querySelectorAll('[data-delay]').forEach((el) => {
     el.style.setProperty('--reveal-delay', `${el.dataset.delay}s`);
   });
-  // Navbar on load: logo, links, then the button
-  if (header) {
-    header
-      .querySelectorAll('.logo[data-pop], .main-nav [data-split], .header-cta[data-pop]')
-      .forEach((el, i) => el.style.setProperty('--reveal-delay', `${(i * 0.06).toFixed(2)}s`));
-  }
 
   // Line reveal: each line slides up from behind a clipping edge, one line
   // after another. Words are wrapped individually and every word on the same
@@ -633,63 +627,149 @@
   }
 
   /* ---------------------------------------------------------
-     Assessment form (client-side validation)
+     Forms (client-side validation): assessment + job application.
+     Each .field is checked as a unit, since some hold several controls.
      --------------------------------------------------------- */
-  const form = document.querySelector('[data-form]');
-  if (form) {
+  const MAX_UPLOAD_MB = 10;
+
+  // First problem in a field as [control, message], or null when it's fine
+  function fieldProblem(field) {
+    for (const c of field.querySelectorAll('input, select, textarea')) {
+      if (c.validity.valueMissing) return [c, 'This field is required.'];
+      if (c.validity.typeMismatch) return [c, 'Please enter a valid email address.'];
+      if (c.type === 'tel' && c.value && c.value.replace(/\D/g, '').length < 10) {
+        return [c, 'Please enter a valid phone number.'];
+      }
+      const file = c.type === 'file' && c.files[0];
+      if (file && !/\.(pdf|docx?)$/i.test(file.name)) return [c, 'Please upload a PDF or Word file.'];
+      if (file && file.size > MAX_UPLOAD_MB * 1024 * 1024) return [c, `Please upload a file under ${MAX_UPLOAD_MB}MB.`];
+    }
+    const [low, high] = field.querySelectorAll('[data-grade]');
+    if (low && high && !high.disabled && low.value && high.value && Number(low.value) > Number(high.value)) {
+      return [high, 'The lowest grade can’t be above the highest.'];
+    }
+    return null;
+  }
+
+  function showError(field, problem) {
+    let err = field.querySelector('.field-error');
+    field.classList.toggle('has-error', Boolean(problem));
+    field.querySelectorAll('[aria-invalid]').forEach((c) => {
+      c.removeAttribute('aria-invalid');
+      c.removeAttribute('aria-describedby');
+    });
+    if (!problem) {
+      if (err) err.remove();
+      return;
+    }
+    const [control, msg] = problem;
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'field-error';
+      field.appendChild(err);
+    }
+    err.id = `${control.id}-error`;
+    err.textContent = msg;
+    control.setAttribute('aria-invalid', 'true');
+    control.setAttribute('aria-describedby', err.id);
+  }
+
+  document.querySelectorAll('[data-form]').forEach((form) => {
     const status = form.querySelector('[data-form-status]');
+    const fields = [...form.querySelectorAll('.field')];
 
-    const setError = (input, msg) => {
-      const field = input.closest('.field');
-      let err = field.querySelector('.field-error');
-      field.classList.toggle('has-error', Boolean(msg));
-      input.setAttribute('aria-invalid', String(Boolean(msg)));
-      if (msg) {
-        if (!err) {
-          err = document.createElement('span');
-          err.className = 'field-error';
-          err.id = `${input.id}-error`;
-          field.appendChild(err);
-          input.setAttribute('aria-describedby', err.id);
-        }
-        err.textContent = msg;
-      } else if (err) {
-        err.remove();
-        input.removeAttribute('aria-describedby');
-      }
+    const validate = (field) => {
+      const problem = fieldProblem(field);
+      showError(field, problem);
+      return !problem;
     };
 
-    const validate = (input) => {
-      if (input.validity.valueMissing) return setError(input, 'This field is required.'), false;
-      if (input.validity.typeMismatch) return setError(input, 'Please enter a valid email address.'), false;
-      if (input.type === 'tel' && input.value && input.value.replace(/\D/g, '').length < 10) {
-        return setError(input, 'Please enter a valid phone number.'), false;
-      }
-      setError(input, '');
-      return true;
-    };
-
-    form.querySelectorAll('input[required]').forEach((input) => {
-      input.addEventListener('blur', () => input.value && validate(input));
-      input.addEventListener('input', () => input.closest('.field').classList.contains('has-error') && validate(input));
+    fields.forEach((field) => {
+      // Checked once the visitor leaves a filled-in field (not when moving
+      // between controls inside it); after an error, re-checked as they fix it
+      field.addEventListener('focusout', (e) => {
+        if (field.contains(e.relatedTarget)) return;
+        const filled = [...field.querySelectorAll('input:not([type="checkbox"]), select, textarea')].some((c) => c.value);
+        if (filled) validate(field);
+      });
+      field.addEventListener('input', () => field.classList.contains('has-error') && validate(field));
+      field.addEventListener('change', (e) => {
+        if (e.target.type === 'file' || field.classList.contains('has-error')) validate(field);
+      });
     });
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-      const required = [...form.querySelectorAll('input[required]')];
-      const results = required.map(validate);
-      const firstInvalid = required[results.indexOf(false)];
+      const results = fields.map(validate);
+      const firstInvalid = fields[results.indexOf(false)];
       if (firstInvalid) {
-        firstInvalid.focus();
+        firstInvalid.querySelector('[aria-invalid]').focus();
         status.textContent = '';
         return;
       }
 
       // TODO: send the data to your form service, e.g.
       // fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
-      status.textContent = 'Thanks! We’ll be in touch shortly to schedule your free assessment.';
+      status.textContent = form.dataset.success;
       form.reset();
     });
+  });
+
+  /* ---------------------------------------------------------
+     Job application extras: add-a-subject chip and the resume drop zone
+     --------------------------------------------------------- */
+  const chips = document.querySelector('[data-chips]');
+  if (chips) {
+    const addBtn = chips.querySelector('[data-chip-add]');
+    const input = chips.querySelector('[data-chip-input]');
+
+    const close = (keep) => {
+      const value = input.value.trim();
+      if (keep && value) {
+        const chip = document.createElement('label');
+        chip.className = 'chip';
+        chip.dataset.custom = '';
+        chip.innerHTML = '<input type="checkbox" name="subjects" checked><span></span>';
+        chip.querySelector('input').value = value;
+        chip.querySelector('span').textContent = value;
+        chips.insertBefore(chip, addBtn);
+      }
+      input.value = '';
+      input.hidden = true;
+      addBtn.hidden = false;
+    };
+
+    addBtn.addEventListener('click', () => {
+      addBtn.hidden = true;
+      input.hidden = false;
+      input.focus();
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== 'Escape') return;
+      e.preventDefault(); // Enter would submit the form
+      close(e.key === 'Enter');
+      addBtn.focus();
+    });
+    input.addEventListener('blur', () => !input.hidden && close(true));
+    chips.closest('form').addEventListener('reset', () => {
+      chips.querySelectorAll('[data-custom]').forEach((c) => c.remove());
+    });
+  }
+
+  const dropzone = document.querySelector('[data-dropzone]');
+  if (dropzone) {
+    const input = dropzone.querySelector('input[type="file"]');
+    const nameEl = dropzone.querySelector('[data-file-name]');
+    const emptyText = nameEl.textContent;
+    const sync = () => {
+      const file = input.files[0];
+      nameEl.textContent = file ? file.name : emptyText;
+      dropzone.classList.toggle('has-file', Boolean(file));
+    };
+    input.addEventListener('change', sync);
+    ['dragenter', 'dragover'].forEach((t) => input.addEventListener(t, () => dropzone.classList.add('is-dragover')));
+    ['dragleave', 'drop'].forEach((t) => input.addEventListener(t, () => dropzone.classList.remove('is-dragover')));
+    input.closest('form').addEventListener('reset', () => setTimeout(sync));
   }
 
 })();
