@@ -738,10 +738,12 @@ main {
   margin-top: calc(-1 * var(--main-radius-max));
   padding-top: calc(clamp(3.5rem, 5vw, 5rem) + var(--main-radius-max));
 }
-/* Brand on the left; the three link columns sit together against the right edge */
+/* Brand on the left; the three link columns sit together against the right
+   edge. The first two share one width so all three titles are evenly spaced;
+   the last fits its text so it ends flush with the edge. */
 .footer-grid {
   display: grid;
-  grid-template-columns: 1fr repeat(3, auto);
+  grid-template-columns: 1fr repeat(2, 10.5rem) auto;
   gap: 2.5rem clamp(3rem, 6vw, 6rem);
   padding-bottom: 3.5rem;
 }
