@@ -992,8 +992,8 @@ main {
    Careers page
    ========================================================= */
 .careers {
-  min-height: 70vh;
-  padding-block: clamp(2.5rem, 5vw, 4.5rem) var(--section-y);
+  min-height: 100vh;
+  padding-block: clamp(2.5rem, 5vw, 4.5rem) calc(var(--section-y) * 4);
 }
 .careers-title {
   max-width: 14ch;
@@ -1013,32 +1013,26 @@ main {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--bg-gray);
-  transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), border-color 0.3s, background-color 0.3s;
+  transition: background-color 0.3s;
 }
-.job-card:hover {
-  transform: translateY(-6px);
-  border-color: var(--peach-line);
-  background: var(--peach);
-  box-shadow: var(--shadow);
-}
+.job-card:hover { background: var(--peach); }
 .job-title {
   font-family: var(--font-display);
   font-size: clamp(1.4rem, 2vw, 1.75rem);
   font-weight: 700;
   letter-spacing: -0.01em;
-  transition: color 0.3s;
 }
-.job-card:hover .job-title { color: var(--orange); }
-.job-text { max-width: 44rem; margin-top: 0.85rem; color: var(--muted); }
+.job-text { max-width: 50rem; margin-top: 0.85rem; color: var(--muted); }
 .job-meta {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.75rem;
   margin-top: 1rem;
   font-weight: 600;
 }
+.job-meta li { display: flex; align-items: center; gap: 0.45rem; }
 .job-meta .icon { width: 1.1rem; height: 1.1rem; }
-.job-card .btn, .job-card .pop-mask { margin-top: 1.5rem; }
+.job-card .btn, .job-card .pop-mask { margin-top: clamp(2rem, 3.5vw, 2.75rem); }
 .job-card .pop-mask .btn { margin-top: 0; }
 
 /* =========================================================
