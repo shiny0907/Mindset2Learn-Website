@@ -1236,7 +1236,7 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   align-items: flex-end;
   gap: 1rem 2rem;
 }
-.hiw-intro-head .section-sub { margin-top: 0; text-align: right; }
+.hiw-intro-head .section-sub { margin-top: 0; font-size: 0.9375rem; line-height: 1.5; text-align: right; }
 /* Wide photo band. The image is taller than its frame and drifts
    through it while scrolling (main.js, "Parallax photo"). */
 .hiw-photo {
