@@ -43,8 +43,34 @@
 
   const headerOffset = () => (header ? header.offsetHeight : 0) + 16;
 
+  // Long jumps (e.g. header button → form at the bottom) would race through
+  // the whole page, so instead the page fades out, moves there instantly and
+  // fades back in. The header stays put. Short scrolls stay smooth.
+  const FAR_JUMP = 1.5;    // viewport heights
+  const FADE_MS = 220;     // matches the opacity transition in the css
+
+  function jumpTo(target) {
+    const isTop = target === 'top';
+    if (lenis) {
+      lenis.scrollTo(isTop ? 0 : target, { offset: isTop ? 0 : -headerOffset(), immediate: true, force: true });
+    } else if (isTop) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      target.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }
+
   function scrollToTarget(target) {
     const isTop = target === 'top';
+    const destY = isTop ? 0 : target.getBoundingClientRect().top + window.scrollY - headerOffset();
+    if (!reduceMotion && Math.abs(destY - window.scrollY) > window.innerHeight * FAR_JUMP) {
+      root.classList.add('is-jumping');
+      setTimeout(() => {
+        jumpTo(target);
+        setTimeout(() => root.classList.remove('is-jumping'), 40); // fade back in once the new spot is painted
+      }, FADE_MS);
+      return;
+    }
     if (lenis) {
       lenis.scrollTo(isTop ? 0 : target, { offset: isTop ? 0 : -headerOffset() });
     } else if (isTop) {

@@ -72,6 +72,10 @@ html {
 }
 @media (max-width: 1100px) { html { font-size: 15px; } }
 
+/* Long in-page jumps: the page fades out, moves, and fades back in (main.js) */
+main, .site-footer { transition: opacity 0.22s var(--ease); }
+.is-jumping main, .is-jumping .site-footer { opacity: 0; }
+
 /* Native fallback when Lenis isn't running */
 html:not(.lenis) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html:not(.lenis) { scroll-behavior: auto; } }
@@ -1105,6 +1109,12 @@ main {
 }
 .construction .section-sub { margin-inline: auto; }
 .construction .hero-actions { justify-content: center; margin-top: var(--space-cta); }
+
+/* =========================================================
+   Book a free assessment page (just the form panel)
+   ========================================================= */
+/* The panel has its own padding, so it only needs a small gap under the header */
+.book { padding-block: clamp(1rem, 2.5vw, 2rem) var(--section-y); }
 
 /* =========================================================
    Job page + application form
