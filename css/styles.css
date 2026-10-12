@@ -453,14 +453,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .wide-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: center;
   gap: clamp(2rem, 4vw, 4rem);
   margin-top: 1.25rem;
   padding: clamp(1.25rem, 2vw, 1.75rem);
   padding-left: clamp(1.75rem, 3vw, 2.75rem);
 }
+/* Text at the top, button pinned to the bottom (like the grade cards' links) */
+.wide-card-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-block: clamp(0.25rem, 0.5vw, 0.5rem);
+}
 .wide-card-copy .card-title { margin-bottom: 0.85rem; }
-.wide-card-copy .btn { margin-top: var(--space-cta); }
+.wide-card-copy .tags { margin-bottom: var(--space-cta); }
+.wide-card-copy .btn { margin-top: auto; }
 .wide-card-media {
   aspect-ratio: 16 / 10;
   border-radius: calc(var(--radius) - 0.25rem);
@@ -731,10 +738,11 @@ main {
   margin-top: calc(-1 * var(--main-radius-max));
   padding-top: calc(clamp(3.5rem, 5vw, 5rem) + var(--main-radius-max));
 }
+/* Brand on the left; the three link columns sit together against the right edge */
 .footer-grid {
   display: grid;
-  grid-template-columns: 2fr repeat(3, 1fr);
-  gap: 2.5rem;
+  grid-template-columns: 1fr repeat(3, auto);
+  gap: 2.5rem clamp(3rem, 6vw, 6rem);
   padding-bottom: 3.5rem;
 }
 .footer-tagline {
@@ -1070,8 +1078,22 @@ main {
 /* =========================================================
    Job page + application form
    ========================================================= */
-.job-page { padding-block: var(--page-top) calc(var(--section-y) * 2); }
+/* less top space than other pages: the back link sits in it */
+.job-page { padding-block: calc(var(--page-top) * 0.5) calc(var(--section-y) * 2); }
 .job-page .job-meta { margin-top: 1.5rem; }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  color: var(--muted);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: color var(--dur);
+}
+.back-link .icon { width: 1rem; height: 1rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
+.back-link:hover { color: var(--orange); }
+.back-link:hover .icon { transform: translateX(-3px); }
 .apply-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
