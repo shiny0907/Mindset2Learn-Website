@@ -166,18 +166,31 @@
     const SPEED = 45;       // drift in px per second
     const FRICTION = 0.94;  // how quickly a flick slows down (per frame)
     let loopW = 0;          // width of one full set of cards
+    let lead = 0;           // empty padding before the first card
     let pos = 0;
     let vel = 0;            // px per frame, left over from a flick
     let started = false;
     let drag = null;
     let raf = 0;
     let last = null;
+    let leadIn = true;      // the empty padding is only shown at the very start
 
     const measure = () => {
       loopW = track.children[originals.length].offsetLeft - originals[0].offsetLeft;
+      lead = parseFloat(getComputedStyle(track).paddingLeft) || 0;
     };
+    // Jumping back one set is invisible only while the view starts past the
+    // padding (cards are on both sides of the jump), so keep pos in
+    // [lead, lead + loopW) once the strip has moved past it.
     const render = () => {
-      if (loopW) pos = ((pos % loopW) + loopW) % loopW;
+      if (loopW) {
+        if (pos >= lead) leadIn = false;
+        const min = leadIn ? 0 : lead;
+        if (pos < min || pos >= lead + loopW) {
+          pos = lead + ((((pos - lead) % loopW) + loopW) % loopW);
+          leadIn = false;
+        }
+      }
       track.style.transform = `translate3d(${-pos}px, 0, 0)`;
     };
 
