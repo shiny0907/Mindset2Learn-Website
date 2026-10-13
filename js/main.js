@@ -723,8 +723,6 @@
   const hero = document.querySelector('[data-hero-slider]');
   if (hero) {
     const slides = [...hero.querySelectorAll('.hero-slide')];
-    const currentEl = hero.querySelector('[data-current]');
-    hero.querySelector('[data-total]').textContent = slides.length;
     const n = slides.length;
     const DURATION = 1000;    // normal transition
     const CATCH_UP = 550;     // follow-up transition after rapid clicks
@@ -776,15 +774,32 @@
       });
     }
 
-    const go = (step) => {
-      target = (target + step + n) % n;
+    // Dots follow where the visitor is heading (target), not the slide mid-transition
+    const dotsWrap = hero.querySelector('[data-dots]');
+    const dots = slides.map((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 't-dot';
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Photo ${i + 1} of ${n}`);
+      dot.addEventListener('click', () => { goTo(i); restart(); });
+      dotsWrap.appendChild(dot);
+      return dot;
+    });
+    const syncDots = () => dots.forEach((d, i) => d.setAttribute('aria-selected', String(i === target)));
+
+    const goTo = (i, step = i > target ? 1 : -1) => {
+      if (i === target) return;
+      target = i;
       dir = step;
-      currentEl.textContent = target + 1;
+      syncDots();
       if (running) running.forEach((a) => a.updatePlaybackRate(RUSH_RATE));
       else transition(DURATION);
     };
+    const go = (step) => goTo((target + step + n) % n, step);
 
     setState();
+    syncDots();
     const restart = autoplay(hero, () => go(1));
 
     hero.querySelector('[data-prev]').addEventListener('click', () => { go(-1); restart(); });

@@ -353,13 +353,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
   gap: 1.25rem;
   margin-top: 1.25rem;
 }
-.slider-count {
-  min-width: 2.5rem;
-  text-align: center;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
+/* Same dots as the testimonial carousel (.t-dot) */
+.slider-dots { display: flex; align-items: center; gap: 0.85rem; }
+.slider-dots .t-dot { width: 0.75rem; height: 0.75rem; }
+.slider-dots .t-dot[aria-selected="true"] { width: 1.9rem; }
 
 /* Shared media frame (with placeholder until real photos are added) */
 .media {
@@ -479,7 +476,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   padding-block: clamp(0.25rem, 0.5vw, 0.5rem);
 }
 .wide-card-copy .card-title { margin-bottom: 0.85rem; }
-.wide-card-copy .tags { margin-bottom: var(--space-cta); }
+.wide-card-copy .card-text { margin-bottom: var(--space-cta); }
 .wide-card-copy .btn { margin-top: auto; }
 .wide-card-media {
   aspect-ratio: 16 / 10;
