@@ -354,9 +354,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   margin-top: 1.25rem;
 }
 /* Same dots as the testimonial carousel (.t-dot) */
-.slider-dots { display: flex; align-items: center; gap: 0.85rem; }
-.slider-dots .t-dot { width: 0.75rem; height: 0.75rem; }
-.slider-dots .t-dot[aria-selected="true"] { width: 1.9rem; }
+.slider-dots { display: flex; align-items: center; gap: 0.5rem; }
 
 /* Shared media frame (with placeholder until real photos are added) */
 .media {
@@ -605,7 +603,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 1.5rem;
+  margin-top: -0.45rem;
 }
 .t-dot {
   width: 0.55rem;
