@@ -891,6 +891,7 @@
   const faq = document.querySelector('[data-faq]');
   if (faq) {
     const items = [...faq.querySelectorAll('.faq-item')];
+    let faqTimer = null;
     items.forEach((item) => {
       const btn = item.querySelector('.faq-q button');
       btn.addEventListener('click', () => {
@@ -903,20 +904,24 @@
           item.classList.add('is-open');
           btn.setAttribute('aria-expanded', 'true');
         }
-        // When an open answer above collapses, everything below slides up. Keep
-        // the clicked question pinned under the cursor by scrolling with it.
-        const anchorTop = btn.getBoundingClientRect().top;
-        const started = performance.now();
-        const keepInPlace = () => {
-          const drift = btn.getBoundingClientRect().top - anchorTop;
-          if (Math.abs(drift) > 0.5) {
-            if (lenis) lenis.scrollTo(window.scrollY + drift, { immediate: true, force: true });
-            else window.scrollBy(0, drift);
-          }
-          if (performance.now() - started < 600) requestAnimationFrame(keepInPlace);
-          else if (lenis) lenis.resize(); // page height changed; keep Lenis in sync
-        };
-        requestAnimationFrame(keepInPlace);
+        // Once the open/close animation settles, nudge the page only if the
+        // opened answer ended up partly off screen (never past its question).
+        root.classList.add('faq-animating');
+        clearTimeout(faqTimer);
+        faqTimer = setTimeout(() => {
+          root.classList.remove('faq-animating');
+          if (lenis) lenis.resize(); // page height changed; keep Lenis in sync
+          if (!willOpen) return;
+          const rect = item.getBoundingClientRect();
+          const topRoom = rect.top - headerOffset();
+          const overflow = rect.bottom - (window.innerHeight - 16);
+          let delta = 0;
+          if (topRoom < 0) delta = topRoom;
+          else if (overflow > 0) delta = Math.min(overflow, topRoom);
+          if (Math.abs(delta) < 1) return;
+          if (lenis) lenis.scrollTo(window.scrollY + delta, { duration: 0.6 });
+          else window.scrollBy({ top: delta, behavior: reduceMotion ? 'auto' : 'smooth' });
+        }, 480);
       });
     });
   }

@@ -627,6 +627,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .faq-head .section-title { max-width: 12ch; }
 
 .faq-list { display: grid; gap: 0.9rem; }
+/* Browser scroll anchoring jumps the page while an answer opens/closes */
+html.faq-animating { overflow-anchor: none; }
 .faq-item {
   border: 1px solid var(--line);
   border-radius: var(--radius);
