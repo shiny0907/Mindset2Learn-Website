@@ -1100,10 +1100,7 @@ main {
 /* =========================================================
    Tutoring page
    ========================================================= */
-.subjects {
-  min-height: 100vh;
-  padding-block: var(--page-top) var(--section-y);
-}
+.subjects { padding-block: var(--page-top) var(--section-y); }
 .subjects .section-head { margin-bottom: clamp(3.5rem, 6vw, 5.5rem); }
 
 /* Subject list: each row opens to a longer description + tags.
