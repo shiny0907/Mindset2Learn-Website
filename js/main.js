@@ -927,6 +927,29 @@
   }
 
   /* ---------------------------------------------------------
+     Subject list (tutoring page): each row opens on its own.
+     No auto-scrolling and no closing other rows, so nothing above
+     the clicked row moves and Lenis is never fought for the page.
+     --------------------------------------------------------- */
+  const subjectList = document.querySelector('[data-subjects]');
+  if (subjectList) {
+    let subjectTimer = null;
+    subjectList.querySelectorAll('.subject').forEach((item) => {
+      const btn = item.querySelector('.subject-q button');
+      btn.addEventListener('click', () => {
+        const open = item.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', String(open));
+        root.classList.add('subjects-animating');
+        clearTimeout(subjectTimer);
+        subjectTimer = setTimeout(() => {
+          root.classList.remove('subjects-animating');
+          if (lenis) lenis.resize(); // page height changed; keep Lenis in sync
+        }, 480);
+      });
+    });
+  }
+
+  /* ---------------------------------------------------------
      Forms (client-side validation): assessment + job application.
      Each .field is checked as a unit, since some hold several controls.
      --------------------------------------------------------- */

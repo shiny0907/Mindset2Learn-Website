@@ -1094,18 +1094,134 @@ main {
 .job-card .pop-mask .btn { margin-top: 0; }
 
 /* =========================================================
-   Tutoring page (under construction)
+   Tutoring page
    ========================================================= */
-.construction {
-  display: grid;
-  align-items: center;
-  min-height: calc(100vh - var(--header-h));
-  min-height: calc(100svh - var(--header-h));
+.subjects {
+  min-height: 100vh;
   padding-block: var(--page-top) var(--section-y);
-  text-align: center;
 }
-.construction .section-sub { margin-inline: auto; }
-.construction .hero-actions { justify-content: center; margin-top: var(--space-cta); }
+.subjects .section-head { margin-bottom: clamp(3.5rem, 6vw, 5.5rem); }
+
+/* Subject list: each row opens to a longer description + tags.
+   Row and opened body share the same columns so the text lines up. */
+.subject-list {
+  --subject-cols: minmax(0, 20rem) minmax(0, 1fr) 1.5rem;
+  --subject-gap: clamp(2rem, 4vw, 4rem);
+  --subject-num-x: 1.25rem;  /* big faded number, from the row's edge */
+  --subject-indent: 3rem;    /* title sits over the number */
+  --subject-pad-r: 1.5rem;
+  border-top: 1px solid var(--peach-line);
+  transition: border-color var(--dur);
+}
+/* Same as the FAQ: stop scroll anchoring from moving the page mid-animation */
+html.subjects-animating { overflow-anchor: none; }
+/* Same as the FAQ: peach on hover; open = orange header over a peach body.
+   The lines touching a highlighted row fade out so its rounded box reads clean. */
+.subject {
+  position: relative;
+  border-radius: var(--radius);
+  transition: background-color var(--dur);
+}
+/* Divider drawn separately so it stays straight under the rounded corners */
+.subject::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: var(--peach-line);
+  transition: opacity var(--dur);
+}
+.subject:hover, .subject.is-open { background: var(--peach); }
+.subject:hover::after, .subject.is-open::after,
+.subject:has(+ .subject:hover)::after,
+.subject:has(+ .subject.is-open)::after { opacity: 0; }
+.subject + .subject { margin-top: 1px; }
+.subject-list:has(> .subject:first-child:hover),
+.subject-list:has(> .subject:first-child.is-open) { border-top-color: transparent; }
+.subject-q { font-size: inherit; font-weight: inherit; }
+.subject-q button {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--subject-cols);
+  align-items: center;
+  column-gap: var(--subject-gap);
+  width: 100%;
+  padding: clamp(2rem, 3vw, 2.6rem) var(--subject-pad-r) clamp(2rem, 3vw, 2.6rem) var(--subject-indent);
+  border: 0;
+  border-radius: calc(var(--radius) - 1px);
+  background: transparent;
+  text-align: left;
+  transition: background-color var(--dur), color var(--dur);
+}
+.subject-q button:focus-visible { outline-offset: -3px; }
+.subject.is-open .subject-q button { background: var(--orange); color: #fff; }
+.subject-num {
+  position: absolute;
+  left: var(--subject-num-x);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-display);
+  font-size: 4.25rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--bg-gray-dark);
+  opacity: 0.6;
+  transition: color var(--dur), opacity var(--dur);
+}
+.subject-name {
+  position: relative; /* above the number */
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.7vw, 1.7rem); /* same as .card-title */
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.subject-lead { color: var(--muted); font-size: 0.975rem; transition: color var(--dur); }
+.subject-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  justify-self: end;
+  transition: transform 0.4s var(--ease), color var(--dur);
+}
+.subject:not(.is-open):hover .subject-num { color: var(--peach-line); opacity: 1; }
+.subject:not(.is-open):hover .subject-icon { color: var(--orange); }
+.subject.is-open .subject-num { color: #fff; opacity: 0.22; }
+.subject.is-open .subject-lead { color: rgba(255, 255, 255, 0.88); }
+.subject.is-open .subject-icon { transform: rotate(135deg); }
+
+.subject-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.45s var(--ease);
+}
+.subject.is-open .subject-a { grid-template-rows: 1fr; }
+.subject-a-inner { overflow: hidden; }
+.subject-body {
+  display: grid;
+  grid-template-columns: var(--subject-cols);
+  column-gap: var(--subject-gap);
+  padding: clamp(1.75rem, 3vw, 2.25rem) var(--subject-pad-r) clamp(2.25rem, 4vw, 3rem) var(--subject-indent);
+  opacity: 0;
+  transform: translateY(-0.5rem);
+  transition: opacity 0.3s var(--ease), transform 0.45s var(--ease);
+}
+.subject.is-open .subject-body { opacity: 1; transform: none; transition-delay: 0.1s; }
+.subject-body > * { grid-column: 2; }
+.subject-body p { max-width: 38rem; line-height: 1.75; }
+.subject-body .tags { gap: 0.6rem; margin-top: 1.6rem; }
+
+@media (max-width: 760px) {
+  .subject-list { --subject-num-x: 0.85rem; --subject-indent: 2.4rem; --subject-pad-r: 1.1rem; }
+  .subject-q button {
+    grid-template-columns: minmax(0, 1fr) 1.5rem;
+    row-gap: 0.5rem;
+    padding-block: 1.75rem;
+  }
+  .subject-lead { grid-row: 2; grid-column: 1 / -1; }
+  .subject-num { top: 1.25rem; transform: none; font-size: 3.5rem; }
+  .subject-body { display: block; padding-block: 1.5rem 2rem; }
+}
 
 /* =========================================================
    Book a free assessment page (just the form panel)
