@@ -958,12 +958,12 @@
      --------------------------------------------------------- */
   const pit = document.querySelector('[data-pill-pit]');
   if (pit && window.Matter && !reduceMotion) {
-    const { Engine, Bodies, Body, Composite, Constraint } = window.Matter;
+    const { Engine, Bodies, Body, Composite, Constraint, Sleeping } = window.Matter;
     const STEP = 1000 / 60;   // fixed physics step, same feel on 60 and 120Hz screens
     const WALL = 400;         // thick walls so fast pills can't pass through
     const DROP_GAP = 110;     // ms between pills falling in
     const MAX_SPEED = 35;     // px per step
-    const engine = Engine.create();
+    const engine = Engine.create({ enableSleeping: true }); // resting pills cost nothing
     const pillEls = [...pit.querySelectorAll('.pill')];
     const items = [];         // { el, body, w, h }
     let walls = [];
@@ -1005,7 +1005,7 @@
         friction: 0.4,
         frictionAir: 0.012,
       });
-      const item = { el, body, w, h };
+      const item = { el, body, w, h, drawn: '' };
       items.push(item);
       Composite.add(engine.world, body);
       el.classList.add('is-in');
@@ -1023,6 +1023,7 @@
       e.preventDefault();
       const p = toLocal(e.clientX, e.clientY);
       const { body } = item;
+      Sleeping.set(body, false);
       const constraint = Constraint.create({
         pointA: p,
         bodyB: body,
@@ -1045,6 +1046,7 @@
       item.el.classList.remove('is-held');
       // A tap without dragging makes the pill hop
       if (!moved) {
+        Sleeping.set(item.body, false);
         Body.setVelocity(item.body, { x: (Math.random() - 0.5) * 6, y: -12 });
         Body.setAngularVelocity(item.body, (Math.random() - 0.5) * 0.3);
       }
@@ -1077,6 +1079,7 @@
         items.forEach(({ body }) => {
           if (held && held.item.body === body) return;
           if (body.velocity.y > -kick) {
+            Sleeping.set(body, false);
             Body.setVelocity(body, { x: body.velocity.x + (Math.random() - 0.5) * kick * 0.3, y: -kick });
             Body.setAngularVelocity(body, body.angularVelocity + (Math.random() - 0.5) * 0.01 * kick);
           }
@@ -1086,18 +1089,30 @@
       // The held pill follows the pointer, even while the page scrolls under it
       if (held) held.constraint.pointA = toLocal(held.x, held.y);
 
-      for (let steps = 0; acc >= STEP && steps < 4; steps++) {
-        Engine.update(engine, STEP);
-        acc -= STEP;
-      }
-      acc = Math.min(acc, STEP);
+      // Once every pill has gone to sleep there's nothing to simulate or redraw
+      // until a scroll, drag, or tap wakes one up
+      const allAsleep = !held && items.length === pillEls.length && items.every(({ body }) => body.isSleeping);
+      if (allAsleep) {
+        acc = 0;
+      } else {
+        for (let steps = 0; acc >= STEP && steps < 4; steps++) {
+          Engine.update(engine, STEP);
+          acc -= STEP;
+        }
+        acc = Math.min(acc, STEP);
 
-      items.forEach(({ el, body, w, h }) => {
-        const { x: vx, y: vy } = body.velocity;
-        const speed = Math.hypot(vx, vy);
-        if (speed > MAX_SPEED) Body.setVelocity(body, { x: (vx / speed) * MAX_SPEED, y: (vy / speed) * MAX_SPEED });
-        el.style.transform = `translate(${body.position.x - w / 2}px, ${body.position.y - h / 2}px) rotate(${body.angle}rad)`;
-      });
+        items.forEach((item) => {
+          const { el, body, w, h } = item;
+          const { x: vx, y: vy } = body.velocity;
+          const speed = Math.hypot(vx, vy);
+          if (speed > MAX_SPEED) Body.setVelocity(body, { x: (vx / speed) * MAX_SPEED, y: (vy / speed) * MAX_SPEED });
+          const transform = `translate(${(body.position.x - w / 2).toFixed(1)}px, ${(body.position.y - h / 2).toFixed(1)}px) rotate(${body.angle.toFixed(3)}rad)`;
+          if (transform !== item.drawn) { // only touch pills that moved
+            el.style.transform = transform;
+            item.drawn = transform;
+          }
+        });
+      }
 
       if (visible || held) raf = requestAnimationFrame(frame);
     }
@@ -1138,6 +1153,7 @@
             item.h = h;
           }
           const { x, y } = item.body.position;
+          Sleeping.set(item.body, false);
           Body.setPosition(item.body, {
             x: Math.min(Math.max(x, w / 2), W - w / 2),
             y: Math.min(y, H - h / 2),
