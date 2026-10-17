@@ -1369,7 +1369,6 @@ html.subjects-animating { overflow-anchor: none; }
   .split-head br { display: none; }
   .struggles { grid-template-columns: 1fr; }
   .teach-grid { grid-template-columns: 1fr; }
-  .level-card { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .grade-title { text-align: left; }
@@ -1693,7 +1692,7 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .hero-media { justify-self: center; max-width: 30rem; }
   .grade-grid { grid-template-columns: 1fr; }
   .grade-card .card-title { max-width: none; }
-  .wide-card { grid-template-columns: 1fr; padding: 1.5rem; }
+  .wide-card { padding: 1.5rem; }
   .approach-media { max-width: 30rem; aspect-ratio: 4 / 3.6; }
   .faq-head { position: static; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
@@ -1733,6 +1732,8 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
 }
 
 @media (max-width: 560px) {
+  /* Text + photo cards stay side by side on tablets, stack on phones */
+  .wide-card { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .hero-title br, .about-cta br { display: none; }
