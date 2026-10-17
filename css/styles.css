@@ -149,6 +149,21 @@ button { font: inherit; color: inherit; cursor: pointer; }
   margin-bottom: 0.75rem;
 }
 
+/* Breadcrumb on sub-pages (Tutoring › Grades K–5, Careers › a role); sits where an eyebrow would */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem; /* same as .eyebrow → title */
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.breadcrumb a { transition: color var(--dur); }
+.breadcrumb a:hover { color: var(--orange); }
+.breadcrumb [aria-current] { color: var(--orange); }
+
 .section-title {
   font-family: var(--font-display);
   font-weight: 700;
@@ -1101,7 +1116,6 @@ main {
    Tutoring page
    ========================================================= */
 .subjects { padding-block: var(--page-top) var(--section-y); }
-.subjects .section-head { margin-bottom: clamp(3.5rem, 6vw, 5.5rem); }
 
 /* Subject list: each row opens to a longer description + tags.
    Row and opened body share the same columns so the text lines up. */
@@ -1168,6 +1182,7 @@ html.subjects-animating { overflow-anchor: none; }
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
+  transition: color var(--dur);
 }
 .subject-lead { color: var(--muted); font-size: 0.975rem; transition: color var(--dur); }
 .subject-icon {
@@ -1178,6 +1193,8 @@ html.subjects-animating { overflow-anchor: none; }
 }
 .subject:hover .subject-num,
 .subject.is-open .subject-num { color: var(--orange-soft); opacity: 0.55; }
+.subject:hover .subject-name,
+.subject.is-open .subject-name,
 .subject:hover .subject-icon,
 .subject.is-open .subject-icon { color: var(--orange); }
 .subject.is-open .subject-icon { transform: rotate(135deg); }
@@ -1216,6 +1233,151 @@ html.subjects-animating { overflow-anchor: none; }
 }
 
 /* =========================================================
+   Grade pages (Grades K–5)
+   ========================================================= */
+.grade-hero { padding-block: var(--page-top) var(--section-y); }
+/* Oversized title (same size as the About page's), set to the right;
+   intro under it on the left */
+.grade-title {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 9vw, 8.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-align: right;
+}
+.grade-intro {
+  max-width: 24rem;
+  margin-top: var(--space-head);
+  color: var(--muted);
+  font-size: 1.0625rem;
+}
+
+/* Heading on the left, short intro on the right, sharing a baseline */
+.split-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem var(--gap-cols);
+}
+.split-head .section-sub { max-width: 22rem; margin-top: 0; text-align: right; }
+
+.struggles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem var(--gap-cols);
+  padding: clamp(1.5rem, 3vw, 2.25rem); /* same as .job-card */
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-gray);
+}
+.struggle .pillar-icon { margin-bottom: 1.25rem; }
+
+/* ---------- Falling pills ---------- */
+.pill-pit {
+  position: relative;
+  height: clamp(22rem, 34vw, 30rem);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-gray);
+}
+.pill-hint {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.5rem;
+  color: var(--placeholder);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  pointer-events: none;
+}
+/* Without physics (no JS / reduced motion) the pills sit in a neat pile at the bottom */
+.pills {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 1.5rem;
+}
+.pill {
+  display: inline-block;
+  padding: 0.65rem 1.3rem;
+  border: 1px solid var(--tag-line);
+  border-radius: 999px;
+  background: #FEF6E1; /* solid, so overlapping pills don't show through */
+  color: var(--tag-ink);
+  font-size: clamp(0.95rem, 1.15vw, 1.125rem);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.pill--orange { border-color: var(--orange); background: var(--orange); color: #fff; }
+.pill--white { border-color: var(--line); background: var(--card); color: var(--ink); }
+/* Physics on (main.js): each pill is placed by its body every frame */
+.pill-pit.is-physics .pills { inset: 0; display: block; padding: 0; }
+.pill-pit.is-physics .pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  cursor: grab;
+  touch-action: none; /* drag the pill, not the page; the rest of the box still scrolls */
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+.pill-pit.is-physics .pill.is-in { visibility: visible; }
+.pill-pit.is-physics .pill.is-held { cursor: grabbing; }
+
+/* ---------- How we teach ---------- */
+.teach-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: start;
+  gap: var(--gap-cols);
+}
+.teach-grid .pillars { margin-top: 0; }
+.teach-grid .pillar-text { max-width: 32rem; }
+
+/* ---------- Other levels ---------- */
+.level-list { display: grid; gap: 1.25rem; }
+.level-card { grid-template-columns: 1.3fr 1fr; margin-top: 0; }
+.level-card .text-link { align-self: flex-start; }
+.level-card .wide-card-media { aspect-ratio: 16 / 9; }
+
+/* Desktop: the hero (title + intro) fills the first screen on its own; the
+   title stays under the breadcrumb and the intro drops to the bottom-left,
+   2.5rem above the fold. The hero's bottom padding (the usual gap to the next
+   section) runs on past the fold. */
+@media (min-width: 961px) {
+  .grade-hero {
+    display: flex;
+    min-height: calc(100vh - var(--header-h) + var(--section-y) - 2.5rem);
+    min-height: calc(100svh - var(--header-h) + var(--section-y) - 2.5rem);
+  }
+  .grade-hero .container { display: flex; flex-direction: column; }
+  .grade-hero-body { display: flex; flex: 1; flex-direction: column; }
+  .grade-intro { margin-top: auto; padding-top: var(--space-head); }
+}
+
+@media (max-width: 960px) {
+  .split-head { flex-direction: column; align-items: flex-start; }
+  .split-head .section-sub { text-align: left; }
+  .split-head br { display: none; }
+  .struggles { grid-template-columns: 1fr; }
+  .teach-grid { grid-template-columns: 1fr; }
+  .level-card { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .grade-title { text-align: left; }
+  .pill-pit { height: 26rem; }
+  .pill { padding: 0.5rem 1rem; font-size: 0.875rem; }
+}
+
+/* =========================================================
    Book a free assessment page (just the form panel)
    ========================================================= */
 /* The panel has its own padding, so it only needs a small gap under the header */
@@ -1225,21 +1387,8 @@ html.subjects-animating { overflow-anchor: none; }
    Job page + application form
    ========================================================= */
 /* less top space than other pages: the back link sits in it */
-.job-page { padding-block: calc(var(--page-top) * 0.5) calc(var(--section-y) * 2); }
+.job-page { padding-block: var(--page-top) calc(var(--section-y) * 2); }
 .job-page .job-meta { margin-top: 1.5rem; }
-.back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: clamp(1.75rem, 3vw, 2.5rem);
-  color: var(--muted);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  transition: color var(--dur);
-}
-.back-link .icon { width: 1rem; height: 1rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
-.back-link:hover { color: var(--orange); }
-.back-link:hover .icon { transform: translateX(-3px); }
 .apply-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

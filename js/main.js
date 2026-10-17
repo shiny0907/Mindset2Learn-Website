@@ -950,6 +950,207 @@
   }
 
   /* ---------------------------------------------------------
+     Falling pills (grade pages): the topic pills drop into their box
+     the first time it comes on screen, hop when the page scrolls, and
+     can be dragged, thrown, or tapped. Matter.js runs the physics; the
+     pills stay real elements that follow their bodies. Without Matter
+     or with reduced motion they just sit in a pile (css).
+     --------------------------------------------------------- */
+  const pit = document.querySelector('[data-pill-pit]');
+  if (pit && window.Matter && !reduceMotion) {
+    const { Engine, Bodies, Body, Composite, Constraint } = window.Matter;
+    const STEP = 1000 / 60;   // fixed physics step, same feel on 60 and 120Hz screens
+    const WALL = 400;         // thick walls so fast pills can't pass through
+    const DROP_GAP = 110;     // ms between pills falling in
+    const MAX_SPEED = 35;     // px per step
+    const engine = Engine.create();
+    const pillEls = [...pit.querySelectorAll('.pill')];
+    const items = [];         // { el, body, w, h }
+    let walls = [];
+    let W = 0;
+    let H = 0;
+    let visible = false;
+    let dropping = false;
+    let raf = 0;
+    let lastTime = 0;
+    let acc = 0;
+    let lastScroll = window.scrollY;
+    let held = null;          // pill being dragged
+    let scrollReady = false;  // scroll jolts wait until the first drop has landed
+    let landBy = Infinity;    // ...or until this time, if a pill never quite settles
+
+    pit.classList.add('is-physics');
+
+    function buildWalls() {
+      W = pit.clientWidth;
+      H = pit.clientHeight;
+      if (walls.length) Composite.remove(engine.world, walls);
+      const tall = H * 4; // sides and lid sit far above the box, so tossed pills fall back in
+      walls = [
+        Bodies.rectangle(W / 2, H + WALL / 2, W + WALL * 2, WALL, { isStatic: true }),
+        Bodies.rectangle(-WALL / 2, H - tall / 2, WALL, tall, { isStatic: true }),
+        Bodies.rectangle(W + WALL / 2, H - tall / 2, WALL, tall, { isStatic: true }),
+        Bodies.rectangle(W / 2, H - tall - WALL / 2, W + WALL * 2, WALL, { isStatic: true }),
+      ];
+      Composite.add(engine.world, walls);
+    }
+
+    function drop(el) {
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+      const body = Bodies.rectangle(w / 2 + Math.random() * Math.max(0, W - w), -h - Math.random() * 80, w, h, {
+        chamfer: { radius: h / 2 - 1 },
+        angle: (Math.random() - 0.5) * 0.6,
+        restitution: 0.35,
+        friction: 0.4,
+        frictionAir: 0.012,
+      });
+      const item = { el, body, w, h };
+      items.push(item);
+      Composite.add(engine.world, body);
+      el.classList.add('is-in');
+      el.addEventListener('pointerdown', (e) => grab(e, item));
+    }
+
+    // Pointer position inside the box
+    function toLocal(clientX, clientY) {
+      const r = pit.getBoundingClientRect();
+      return { x: clientX - r.left - pit.clientLeft, y: clientY - r.top - pit.clientTop };
+    }
+
+    function grab(e, item) {
+      if (held || e.button > 0) return;
+      e.preventDefault();
+      const p = toLocal(e.clientX, e.clientY);
+      const { body } = item;
+      const constraint = Constraint.create({
+        pointA: p,
+        bodyB: body,
+        pointB: { x: p.x - body.position.x, y: p.y - body.position.y },
+        stiffness: 0.2,
+        damping: 0.05,
+        length: 0,
+      });
+      Composite.add(engine.world, constraint);
+      held = { item, constraint, x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY, moved: false };
+      item.el.classList.add('is-held');
+      item.el.setPointerCapture(e.pointerId);
+      run();
+    }
+
+    function release() {
+      if (!held) return;
+      const { item, constraint, moved } = held;
+      Composite.remove(engine.world, constraint);
+      item.el.classList.remove('is-held');
+      // A tap without dragging makes the pill hop
+      if (!moved) {
+        Body.setVelocity(item.body, { x: (Math.random() - 0.5) * 6, y: -12 });
+        Body.setAngularVelocity(item.body, (Math.random() - 0.5) * 0.3);
+      }
+      held = null;
+    }
+
+    pit.addEventListener('pointermove', (e) => {
+      if (!held) return;
+      held.x = e.clientX;
+      held.y = e.clientY;
+      if (Math.hypot(e.clientX - held.startX, e.clientY - held.startY) > 6) held.moved = true;
+    });
+    pit.addEventListener('pointerup', release);
+    pit.addEventListener('pointercancel', release);
+
+    function frame(time) {
+      raf = 0;
+      acc += Math.min(time - (lastTime || time - STEP), 64);
+      lastTime = time;
+
+      // The first drop falls all the way down undisturbed; after that, page
+      // scrolling jolts the pills: the faster the scroll, the higher they hop
+      if (!scrollReady && items.length === pillEls.length) {
+        scrollReady = time > landBy || items.every(({ body }) => body.speed < 0.3 && body.position.y > 0);
+      }
+      const dy = window.scrollY - lastScroll;
+      lastScroll = window.scrollY;
+      const kick = scrollReady ? Math.min(Math.abs(dy) * 0.12, 9) : 0;
+      if (kick > 0.6) {
+        items.forEach(({ body }) => {
+          if (held && held.item.body === body) return;
+          if (body.velocity.y > -kick) {
+            Body.setVelocity(body, { x: body.velocity.x + (Math.random() - 0.5) * kick * 0.3, y: -kick });
+            Body.setAngularVelocity(body, body.angularVelocity + (Math.random() - 0.5) * 0.01 * kick);
+          }
+        });
+      }
+
+      // The held pill follows the pointer, even while the page scrolls under it
+      if (held) held.constraint.pointA = toLocal(held.x, held.y);
+
+      for (let steps = 0; acc >= STEP && steps < 4; steps++) {
+        Engine.update(engine, STEP);
+        acc -= STEP;
+      }
+      acc = Math.min(acc, STEP);
+
+      items.forEach(({ el, body, w, h }) => {
+        const { x: vx, y: vy } = body.velocity;
+        const speed = Math.hypot(vx, vy);
+        if (speed > MAX_SPEED) Body.setVelocity(body, { x: (vx / speed) * MAX_SPEED, y: (vy / speed) * MAX_SPEED });
+        el.style.transform = `translate(${body.position.x - w / 2}px, ${body.position.y - h / 2}px) rotate(${body.angle}rad)`;
+      });
+
+      if (visible || held) raf = requestAnimationFrame(frame);
+    }
+
+    function run() {
+      if (raf) return;
+      lastTime = 0;
+      lastScroll = window.scrollY; // ignore scrolling that happened while paused
+      raf = requestAnimationFrame(frame);
+    }
+
+    // Only simulate while the box is on screen; the first good look drops the pills
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      if (entry.intersectionRatio >= 0.35 && !dropping) {
+        dropping = true;
+        pillEls.forEach((el, i) => setTimeout(() => drop(el), i * DROP_GAP));
+        landBy = performance.now() + pillEls.length * DROP_GAP + 4000;
+      }
+      if (visible) run();
+    }, { threshold: [0, 0.35] }).observe(pit);
+
+    // Box size changed: move the walls, resize pills, and keep them inside
+    let pitResizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(pitResizeTimer);
+      pitResizeTimer = setTimeout(() => {
+        buildWalls();
+        items.forEach((item) => {
+          const w = item.el.offsetWidth;
+          const h = item.el.offsetHeight;
+          if (w !== item.w || h !== item.h) {
+            const angle = item.body.angle; // scale upright so a tilted pill isn't skewed
+            Body.setAngle(item.body, 0);
+            Body.scale(item.body, w / item.w, h / item.h);
+            Body.setAngle(item.body, angle);
+            item.w = w;
+            item.h = h;
+          }
+          const { x, y } = item.body.position;
+          Body.setPosition(item.body, {
+            x: Math.min(Math.max(x, w / 2), W - w / 2),
+            y: Math.min(y, H - h / 2),
+          });
+        });
+        run();
+      }, 150);
+    });
+
+    buildWalls();
+  }
+
+  /* ---------------------------------------------------------
      Forms (client-side validation): assessment + job application.
      Each .field is checked as a unit, since some hold several controls.
      --------------------------------------------------------- */
