@@ -49,7 +49,7 @@
      --------------------------------------------------------- */
   if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     const IDLE_MS = 900;     // fade out after this long without scrolling
-    const THUMB = 48;        // px; same short pill on every page, whatever its length
+    const THUMB = 40;        // px; same short pill on every page, whatever its length
     const bar = document.createElement('div');
     bar.className = 'scrollbar';
     bar.setAttribute('aria-hidden', 'true'); // keyboard and screen readers scroll natively
