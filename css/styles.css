@@ -290,6 +290,46 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .main-nav a.is-active { color: var(--orange); }
 .main-nav a.is-active::after { transform: scaleX(1); }
 
+/* Tutoring dropdown: opens on hover or keyboard focus; "Tutoring" itself
+   still links to the Tutoring page. Phones show the links inline (below). */
+.nav-drop { position: relative; }
+.nav-drop > a { display: inline-flex; align-items: center; gap: 0.3rem; }
+.nav-caret { width: 0.85rem; height: 0.85rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
+.nav-drop:hover .nav-caret,
+.nav-drop:focus-within .nav-caret { transform: rotate(180deg); }
+.nav-sub {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  padding-top: 0.75rem; /* invisible bridge so the menu stays open on the way down */
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -0.35rem);
+  transition: opacity 0.2s var(--ease), transform 0.3s var(--ease), visibility 0.2s;
+}
+.nav-drop:hover .nav-sub,
+.nav-drop:focus-within .nav-sub { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.main-nav .nav-sub ul {
+  display: grid;
+  gap: 0;
+  min-width: 14rem;
+  padding: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.main-nav .nav-sub a {
+  display: block;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  transition: background-color var(--dur), color var(--dur);
+}
+.main-nav .nav-sub a::after { display: none; }
+.main-nav .nav-sub a:hover { background: var(--peach); color: var(--orange); }
+.main-nav .nav-sub a.is-current { color: var(--orange); }
+
 .header-cta { margin-left: 0.5rem; }
 .nav-cta-mobile, .menu-toggle { display: none; }
 
@@ -1377,6 +1417,51 @@ html.subjects-animating { overflow-anchor: none; }
 }
 
 /* =========================================================
+   SOL prep (seasonal): Test Prep link + banner on Home and Tutoring
+   ========================================================= */
+/* Link from the Test Prep subject to the SOL Prep page */
+.subject-body .subject-link { justify-self: start; align-self: auto; margin-top: 1.6rem; padding-top: 0; }
+
+/* Home page: slim banner under the hero (whole banner is the link) */
+.promo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: clamp(2.5rem, 4vw, 3.5rem);
+  padding: 1rem 1.5rem 1rem 1rem;
+  transition: background-color var(--dur), border-color var(--dur);
+}
+.promo:hover { background: var(--peach); border-color: var(--peach-line); }
+.promo-label {
+  flex-shrink: 0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.promo-text { flex: 1; color: var(--muted); font-size: 0.975rem; }
+.promo-text strong { color: var(--ink); font-weight: 600; }
+.promo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  color: var(--orange);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.promo-cta .icon { width: 1rem; height: 1rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
+.promo:hover .promo-cta .icon { transform: translateX(3px); }
+
+@media (max-width: 560px) {
+  .promo { flex-wrap: wrap; padding: 1rem 1.25rem; }
+  .promo-text { flex-basis: 100%; }
+}
+
+/* =========================================================
    Book a free assessment page (just the form panel)
    ========================================================= */
 /* The panel has its own padding, so it only needs a small gap under the header */
@@ -1685,6 +1770,23 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .main-nav ul { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
   .main-nav a:not(.btn) { font-size: 1.125rem; padding-block: 0.6rem; }
   .main-nav a:not(.btn)::after { display: none; }
+  /* Tutoring sub-pages listed inline, indented under "Tutoring" */
+  .main-nav { max-height: calc(100dvh - var(--header-h)); overflow-y: auto; }
+  .nav-caret { display: none; }
+  .nav-drop > a { display: inline; } /* same spacing as the other menu links */
+  .nav-sub { position: static; padding: 0.35rem 0 0.15rem; opacity: 1; visibility: inherit; transform: none; transition: none; }
+  .main-nav .nav-sub ul {
+    min-width: 0;
+    margin-left: 0.15rem;
+    padding: 0 0 0 1rem;
+    border: 0;
+    border-left: 2px solid var(--line);
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .main-nav .nav-sub a { padding: 0.25rem 0 0.25rem 0.25rem; font-size: 1rem; color: var(--muted); }
+  .main-nav .nav-sub a:hover { background: none; }
   .nav-cta-mobile { display: inline-flex; }
 
   .hero-grid,
