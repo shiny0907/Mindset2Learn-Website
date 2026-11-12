@@ -80,12 +80,12 @@ main, .site-footer { transition: opacity 0.22s var(--ease); }
    only once the script has drawn its own, and only for mouse/trackpad. */
 html.has-scrollbar { scrollbar-width: none; }
 html.has-scrollbar::-webkit-scrollbar { display: none; }
-/* Short hairline track centered on the right edge, with a thicker pill on it */
+/* Short track centered on the right edge, with the orange pill sliding in it */
 .scrollbar {
   position: fixed;
   top: 50%;
   right: 0.25rem;
-  width: 1.5rem;         /* hover/grab area; the line and pill are centered in it */
+  width: 1.75rem;        /* hover/grab area; the line and pill are centered in it */
   height: clamp(8rem, 20vh, 12rem);
   transform: translateY(-50%);
   z-index: 60;
@@ -103,21 +103,24 @@ html.has-scrollbar::-webkit-scrollbar { display: none; }
   margin-inline: auto;
   border-radius: 999px;
 }
-.scrollbar::before {   /* hairline track */
+.scrollbar::before {   /* track, same width as the thumb */
   content: "";
   bottom: 0;
-  width: 2px;
-  background: rgba(28, 27, 24, 0.12);
+  width: 10px;
+  background: rgba(28, 27, 24, 0.07);
+  transition: width 0.2s var(--ease);
 }
 .scrollbar-thumb {
-  width: 5px;
+  width: 10px;
   background: var(--orange);
   cursor: grab;
   will-change: transform;
   transition: width 0.2s var(--ease), background-color var(--dur);
 }
+.scrollbar:hover::before,
+.scrollbar.is-dragging::before,
 .scrollbar:hover .scrollbar-thumb,
-.scrollbar.is-dragging .scrollbar-thumb { width: 7px; }
+.scrollbar.is-dragging .scrollbar-thumb { width: 12px; }
 .scrollbar:hover .scrollbar-thumb,
 .scrollbar.is-dragging .scrollbar-thumb { background: var(--orange-dark); }
 .scrollbar.is-dragging .scrollbar-thumb { cursor: grabbing; }
