@@ -41,6 +41,90 @@
     requestAnimationFrame(raf);
   }
 
+  /* ---------------------------------------------------------
+     Custom scrollbar: slim orange thumb on the right edge.
+     Shows while scrolling or when the pointer is over it, fades
+     after a short idle, and can be dragged or clicked. Mouse and
+     trackpad only; touch screens keep their own overlay scrollbar.
+     --------------------------------------------------------- */
+  if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    const IDLE_MS = 900;     // fade out after this long without scrolling
+    const THUMB = 48;        // px; same short pill on every page, whatever its length
+    const bar = document.createElement('div');
+    bar.className = 'scrollbar';
+    bar.setAttribute('aria-hidden', 'true'); // keyboard and screen readers scroll natively
+    bar.innerHTML = '<div class="scrollbar-thumb"></div>';
+    document.body.appendChild(bar);
+    root.classList.add('has-scrollbar');
+    const thumb = bar.firstChild;
+
+    let pad = 0, trackH = 0, thumbH = 0, maxScroll = 0;
+    let hideTimer = null, hovering = false, dragging = false, dragY = 0, dragScroll = 0;
+
+    const measure = () => {
+      pad = thumb.offsetTop;
+      trackH = bar.clientHeight - pad * 2;
+      maxScroll = Math.max(0, root.scrollHeight - window.innerHeight);
+      thumbH = Math.min(trackH, THUMB);
+      thumb.style.height = `${thumbH}px`;
+      bar.classList.toggle('is-off', maxScroll < 1);
+    };
+    const place = () => {
+      const y = maxScroll ? (window.scrollY / maxScroll) * (trackH - thumbH) : 0;
+      thumb.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`;
+    };
+    const show = () => {
+      bar.classList.add('is-visible');
+      clearTimeout(hideTimer);
+      if (!hovering && !dragging) hideTimer = setTimeout(() => bar.classList.remove('is-visible'), IDLE_MS);
+    };
+    const scrollToY = (y, smooth) => {
+      if (lenis) lenis.scrollTo(y, { immediate: !smooth, force: true });
+      else window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
+    };
+    const update = () => { measure(); place(); };
+
+    window.addEventListener('scroll', () => { place(); show(); }, { passive: true });
+    window.addEventListener('resize', update);
+    new ResizeObserver(update).observe(document.body); // accordions, images loading, etc.
+
+    bar.addEventListener('pointerenter', () => { hovering = true; show(); });
+    bar.addEventListener('pointerleave', () => { hovering = false; show(); });
+
+    // Drag the thumb
+    thumb.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      dragging = true;
+      dragY = e.clientY;
+      dragScroll = window.scrollY;
+      thumb.setPointerCapture(e.pointerId);
+      bar.classList.add('is-dragging');
+      show();
+    });
+    thumb.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const perPx = maxScroll / Math.max(1, trackH - thumbH);
+      scrollToY(Math.min(maxScroll, Math.max(0, dragScroll + (e.clientY - dragY) * perPx)));
+    });
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      bar.classList.remove('is-dragging');
+      show();
+    };
+    thumb.addEventListener('pointerup', endDrag);
+    thumb.addEventListener('pointercancel', endDrag);
+
+    // Click the track: glide so the thumb centers on that spot
+    bar.addEventListener('pointerdown', (e) => {
+      if (e.target !== bar) return;
+      const at = e.clientY - bar.getBoundingClientRect().top - pad - thumbH / 2;
+      scrollToY(Math.min(maxScroll, Math.max(0, (at / Math.max(1, trackH - thumbH)) * maxScroll)), true);
+    });
+
+    update();
+  }
+
   const headerOffset = () => (header ? header.offsetHeight : 0) + 16;
 
   // Long jumps (e.g. header button → form at the bottom) would race through

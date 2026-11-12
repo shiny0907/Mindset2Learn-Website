@@ -21,6 +21,9 @@
   <!-- Icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <defs>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
+      <symbol id="i-calendar-check" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
       <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
       <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
       <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M15 3h3v4h-3a1 1 0 0 0-1 1v3h4l-1 4h-3v7h-4v-7H7v-4h3V8a5 5 0 0 1 5-5z"/></symbol>
@@ -240,14 +243,6 @@
             </div>
           </li>
         </ul>
-
-        <!-- ============ SOL PREP BANNER ============ -->
-        <!-- Seasonal: delete this block once SOL season is over (same banner as the home page) -->
-        <a class="promo card" href="sol-prep" data-pop="block">
-          <span class="promo-label">New</span>
-          <span class="promo-text"><strong>SOL Prep Workshops start January 2027.</strong> An extra one-on-one session each week to get ready for test day.</span>
-          <span class="promo-cta">Learn more <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></span>
-        </a>
       </div>
     </section>
 
@@ -297,8 +292,45 @@
       </div>
     </section>
 
+    <!-- ============ SOL PREP ============ -->
+    <!-- Seasonal: same section as the home page. Delete it once SOL season is over, and
+         drop "section--tight" from Get started below so it gets its top spacing back -->
+    <section class="section" id="sol-prep">
+      <div class="container">
+        <header class="split-head section-head" data-reveal-group>
+          <div>
+            <p class="eyebrow" data-split>SOL Prep Workshops</p>
+            <h2 class="section-title" data-split>Get ready for SOL<br> season early</h2>
+          </div>
+          <p class="section-sub" data-split>Starting in early January 2027, students add at least one extra one-on-one session a week, dedicated to SOL prep.</p>
+        </header>
+
+        <ul class="struggles">
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar-check"/></svg></span>
+            <h3 class="pillar-title">Starts in January</h3>
+            <p class="pillar-text">Months of steady practice before testing season, with time to close gaps instead of cramming.</p>
+          </li>
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-target"/></svg></span>
+            <h3 class="pillar-title">Calm on test day</h3>
+            <p class="pillar-text">Strategies for test anxiety, pacing, and tricky questions, so the real test feels familiar.</p>
+          </li>
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span>
+            <h3 class="pillar-title">Math and reading</h3>
+            <p class="pillar-text">Problem-solving and reading comprehension, targeted to where your child needs it most.</p>
+          </li>
+        </ul>
+
+        <div class="about-cta-action">
+          <a class="btn btn-primary" href="sol-prep" data-pop>About SOL Prep</a>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ GET STARTED ============ -->
-    <section class="section">
+    <section class="section section--tight">
       <div class="container">
         <header class="section-head section-head--center about-cta" data-reveal-group>
           <p class="eyebrow" data-split>Get started</p>
@@ -306,7 +338,7 @@
           <p class="section-sub" data-split>Book a free assessment and meet the team that will support your child’s growth. No cost, no commitment.</p>
         </header>
         <div class="about-cta-action">
-          <a class="btn btn-primary btn-lg" href="book" data-pop>Book a Free Assessment</a>
+          <a class="btn btn-primary" href="book" data-pop>Book a Free Assessment</a>
         </div>
       </div>
     </section>

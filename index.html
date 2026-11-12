@@ -27,6 +27,7 @@
       <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
       <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
       <symbol id="i-calendar-check" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></symbol>
+      <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
       <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
       <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
       <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></symbol>
@@ -91,8 +92,8 @@
           <h1 class="hero-title" data-split>Tutoring that<br> builds <em class="accent">confidence</em>,<br> not just grades.</h1>
           <p class="lead" data-split>Personalized tutoring from kindergarten through college in math, reading, and writing, plus the focus and organization skills that help students keep up on their own. Led by a special education teacher with 15+ years of experience.</p>
           <div class="hero-actions">
-            <a class="btn btn-primary btn-lg" href="#contact" data-pop data-delay="0.27">Book a Free Assessment</a>
-            <a class="btn btn-secondary btn-lg" href="how-it-works" data-pop data-delay="0.36">See how it works <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+            <a class="btn btn-primary" href="#contact" data-pop data-delay="0.27">Book a Free Assessment</a>
+            <a class="btn btn-secondary" href="how-it-works" data-pop data-delay="0.36">See how it works <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
           </div>
         </div>
 
@@ -123,16 +124,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- ============ SOL PREP BANNER ============ -->
-      <!-- Seasonal: delete this block once SOL season is over -->
-      <div class="container">
-        <a class="promo card" href="sol-prep" data-pop="block">
-          <span class="promo-label">New</span>
-          <span class="promo-text"><strong>SOL Prep Workshops start January 2027.</strong> An extra one-on-one session each week to get ready for test day.</span>
-          <span class="promo-cta">Learn more <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"/></svg></span>
-        </a>
       </div>
     </section>
 
@@ -182,8 +173,45 @@
       </div>
     </section>
 
+    <!-- ============ SOL PREP ============ -->
+    <!-- Seasonal: delete this section once SOL season is over, and drop
+         "section--tight" from Our approach below so it gets its top spacing back -->
+    <section class="section" id="sol-prep">
+      <div class="container">
+        <header class="split-head section-head" data-reveal-group>
+          <div>
+            <p class="eyebrow" data-split>SOL Prep Workshops</p>
+            <h2 class="section-title" data-split>Get ready for SOL<br> season early</h2>
+          </div>
+          <p class="section-sub" data-split>Starting in early January 2027, students add at least one extra one-on-one session a week, dedicated to SOL prep.</p>
+        </header>
+
+        <ul class="struggles">
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-calendar-check"/></svg></span>
+            <h3 class="pillar-title">Starts in January</h3>
+            <p class="pillar-text">Months of steady practice before testing season, with time to close gaps instead of cramming.</p>
+          </li>
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-target"/></svg></span>
+            <h3 class="pillar-title">Calm on test day</h3>
+            <p class="pillar-text">Strategies for test anxiety, pacing, and tricky questions, so the real test feels familiar.</p>
+          </li>
+          <li class="struggle">
+            <span class="pillar-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span>
+            <h3 class="pillar-title">Math and reading</h3>
+            <p class="pillar-text">Problem-solving and reading comprehension, targeted to where your child needs it most.</p>
+          </li>
+        </ul>
+
+        <div class="about-cta-action">
+          <a class="btn btn-primary" href="sol-prep" data-pop>About SOL Prep</a>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ OUR APPROACH ============ -->
-    <section class="section" id="approach">
+    <section class="section section--tight" id="approach">
       <div class="container approach-grid">
         <figure class="approach-media media" data-placeholder="assets/images/approach.jpg">
           <img src="assets/images/approach.jpg" alt="A tutor and a young student in a Mindset2Learn shirt at a tutoring session" loading="lazy">
