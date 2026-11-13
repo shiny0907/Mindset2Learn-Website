@@ -1149,7 +1149,13 @@ main {
 /* Closing call to action */
 .about-cta { margin-bottom: 0; }
 .about-cta .section-sub { max-width: 30rem; }
-.about-cta-action { margin-top: var(--space-cta); text-align: center; }
+.about-cta-action {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;          /* same as the hero's button pair */
+  margin-top: var(--space-cta);
+}
 
 /* =========================================================
    Careers page

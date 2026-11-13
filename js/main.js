@@ -1332,10 +1332,30 @@
         return;
       }
 
-      // TODO: send the data to your form service, e.g.
-      // fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
-      status.textContent = form.dataset.success;
-      form.reset();
+      // Sent to the form service set in the form's action attribute (e.g. a
+      // Formspree URL). Until one is set, visitors are told to call or email
+      // instead of being shown a success message for a form that went nowhere.
+      const endpoint = form.getAttribute('action') || '';
+      const fallback = 'Please call (571) 899-2687 or email ljrobinson@mindset2learn.com and we’ll get right back to you.';
+      if (!/^https?:\/\//.test(endpoint)) {
+        status.textContent = `Sorry, online sending isn’t set up yet. ${fallback}`;
+        return;
+      }
+      const submit = form.querySelector('[type="submit"]');
+      if (submit) submit.disabled = true;
+      status.textContent = 'Sending…';
+      fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
+        .then((res) => {
+          if (!res.ok) throw new Error(res.status);
+          status.textContent = form.dataset.success;
+          form.reset();
+        })
+        .catch(() => {
+          status.textContent = `Sorry, something went wrong sending that. ${fallback}`;
+        })
+        .finally(() => {
+          if (submit) submit.disabled = false;
+        });
     });
   });
 
