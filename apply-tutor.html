@@ -42,7 +42,6 @@
       <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></symbol>
       <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M3 13h18"/></symbol>
       <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></symbol>
       <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
       <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
       <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
@@ -139,7 +138,7 @@
           </div>
 
           <!-- TODO: point action at your form handler (e.g. Formspree, Netlify Forms, or your own endpoint) -->
-          <form class="apply-form" data-form data-success="Thanks for applying! We’ll review your application and be in touch soon." action="#" method="post" enctype="multipart/form-data" novalidate>
+          <form class="apply-form" data-form="application" data-success="Thanks for applying! We’ll review your application and be in touch soon." action="#" method="post" novalidate>
             <div class="form-row">
               <div class="field">
                 <label for="first-name">First Name<span class="req" aria-hidden="true">*</span></label>
@@ -200,14 +199,7 @@
                 <select id="reading-high" name="reading_grade_high" aria-label="Highest reading and writing grade" data-grade required><option value="">–</option><option value="0">K</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">College</option></select>
               </div>
             </fieldset>
-            <div class="field">
-              <label class="dropzone" data-dropzone>
-                <input id="resume" name="resume" type="file" accept=".pdf,.doc,.docx">
-                <svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>
-                <span class="dropzone-title" data-file-name>Upload a file or drag it here</span>
-                <span class="dropzone-hint">PDF or Word, up to 10MB</span>
-              </label>
-            </div>
+            <p class="form-note">Have a resume? Email it to <a href="mailto:ljrobinson@mindset2learn.com?subject=Tutor%20application%20resume">ljrobinson@mindset2learn.com</a> with your name in the subject line.</p>
             <button class="btn btn-primary btn-block" type="submit">Submit Application</button>
             <p class="form-status" data-form-status role="status" aria-live="polite"></p>
           </form>

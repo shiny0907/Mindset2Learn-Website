@@ -1298,6 +1298,56 @@
     control.setAttribute('aria-describedby', err.id);
   }
 
+  /* Where each form's answers go: a Google Form per site form.
+     url    = the Google Form's ".../formResponse" address
+     fields = which Google question (entry.NNN) gets which answer
+     Both come from the Google Form's "Get pre-filled link". Leave url empty
+     and visitors are asked to call or email instead. */
+  const GOOGLE_FORMS = {
+    assessment: { // "Book a Free Assessment" (Home, Book, How It Works)
+      url: 'https://docs.google.com/forms/d/e/1FAIpQLSfCB-zdqRTgq_osfSg02QqevmvdyEl_eTHWEfWdFxSHosFqvA/formResponse',
+      fields: {
+        first_name: 'entry.192635986',
+        last_name: 'entry.306827675',
+        email: 'entry.2136573239',
+        address: 'entry.998160667',
+        phone: 'entry.1909634487',
+        message: 'entry.41955298',
+      },
+    },
+    application: {
+      url: '',
+      fields: {
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        subjects: '',       // all checked subjects, e.g. "Algebra, SAT prep"
+        math_grades: '',    // e.g. "K to 5"
+        reading_grades: '', // e.g. "6 to College"
+      },
+    },
+  };
+
+  // The site form's answers as plain text, one per Google question
+  function formAnswers(form) {
+    const data = new FormData(form);
+    const answers = {};
+    data.forEach((value, name) => {
+      answers[name] = answers[name] ? `${answers[name]}, ${value}` : String(value);
+    });
+    const gradeText = (name) => {
+      const select = form.querySelector(`select[name="${name}"]`);
+      return select && select.value ? select.options[select.selectedIndex].text : '';
+    };
+    ['math', 'reading'].forEach((subject) => {
+      if (form.querySelector(`[name="${subject}_grade_low"]`)) {
+        answers[`${subject}_grades`] = `${gradeText(`${subject}_grade_low`)} to ${gradeText(`${subject}_grade_high`)}`;
+      }
+    });
+    return answers;
+  }
+
   document.querySelectorAll('[data-form]').forEach((form) => {
     const status = form.querySelector('[data-form-status]');
     const fields = [...form.querySelectorAll('.field')];
@@ -1332,27 +1382,36 @@
         return;
       }
 
-      // Sent to the form service set in the form's action attribute (e.g. a
-      // Formspree URL). Until one is set, visitors are told to call or email
-      // instead of being shown a success message for a form that went nowhere.
-      const endpoint = form.getAttribute('action') || '';
       const fallback = 'Please call (571) 899-2687 or email ljrobinson@mindset2learn.com and we’ll get right back to you.';
-      if (!/^https?:\/\//.test(endpoint)) {
-        status.textContent = `Sorry, online sending isn’t set up yet. ${fallback}`;
+      const say = (text, state) => {
+        status.textContent = text;
+        status.classList.toggle('is-error', state === 'error');
+        status.classList.toggle('is-sending', state === 'sending');
+      };
+      const target = GOOGLE_FORMS[form.dataset.form];
+      if (!target || !target.url) {
+        say(`Sorry, online sending isn’t set up yet. ${fallback}`, 'error');
         return;
       }
+
+      const answers = formAnswers(form);
+      const body = new URLSearchParams();
+      Object.entries(target.fields).forEach(([name, entry]) => {
+        if (entry) body.append(entry, answers[name] || '');
+      });
+
       const submit = form.querySelector('[type="submit"]');
       if (submit) submit.disabled = true;
-      status.textContent = 'Sending…';
-      fetch(endpoint, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } })
-        .then((res) => {
-          if (!res.ok) throw new Error(res.status);
-          status.textContent = form.dataset.success;
+      say('Sending…', 'sending');
+      // Google doesn't let other sites read its reply ("no-cors"), so a
+      // finished request is the best confirmation available; a network
+      // failure still shows the error.
+      fetch(target.url, { method: 'POST', mode: 'no-cors', body })
+        .then(() => {
+          say(form.dataset.success);
           form.reset();
         })
-        .catch(() => {
-          status.textContent = `Sorry, something went wrong sending that. ${fallback}`;
-        })
+        .catch(() => say(`Sorry, something went wrong sending that. ${fallback}`, 'error'))
         .finally(() => {
           if (submit) submit.disabled = false;
         });
@@ -1360,7 +1419,7 @@
   });
 
   /* ---------------------------------------------------------
-     Job application extras: add-a-subject chip and the resume drop zone
+     Job application extras: add-a-subject chip
      --------------------------------------------------------- */
   const chips = document.querySelector('[data-chips]');
   if (chips) {
@@ -1398,22 +1457,6 @@
     chips.closest('form').addEventListener('reset', () => {
       chips.querySelectorAll('[data-custom]').forEach((c) => c.remove());
     });
-  }
-
-  const dropzone = document.querySelector('[data-dropzone]');
-  if (dropzone) {
-    const input = dropzone.querySelector('input[type="file"]');
-    const nameEl = dropzone.querySelector('[data-file-name]');
-    const emptyText = nameEl.textContent;
-    const sync = () => {
-      const file = input.files[0];
-      nameEl.textContent = file ? file.name : emptyText;
-      dropzone.classList.toggle('has-file', Boolean(file));
-    };
-    input.addEventListener('change', sync);
-    ['dragenter', 'dragover'].forEach((t) => input.addEventListener(t, () => dropzone.classList.add('is-dragover')));
-    ['dragleave', 'drop'].forEach((t) => input.addEventListener(t, () => dropzone.classList.remove('is-dragover')));
-    input.closest('form').addEventListener('reset', () => setTimeout(sync));
   }
 
 })();

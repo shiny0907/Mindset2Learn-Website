@@ -820,6 +820,8 @@ html.faq-animating { overflow-anchor: none; }
 .field-error { font-size: 0.8rem; color: var(--error); }
 .cta-form .btn-block, .apply-form .btn-block { margin-top: 0.75rem; }
 .form-status { min-height: 1.5em; font-size: 0.9375rem; font-weight: 500; text-align: center; color: var(--success); }
+.form-status.is-error { color: var(--error); }
+.form-status.is-sending { color: var(--muted); }
 /* Assessment form: the button is the last thing in the panel, level with its
    top padding; the thank-you message shows in the padding below it */
 .cta-form { position: relative; }
@@ -1579,29 +1581,10 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
 .field select:focus { outline: none; border-bottom-color: var(--orange); }
 .field.has-error select { border-bottom-color: var(--error); }
 
-/* Resume upload: the file input covers the whole box, so click and drop both work */
-.field .dropzone {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  gap: 0.2rem;
-  margin-top: 0.5rem;
-  padding: 2rem 1.5rem;
-  border: 1.5px dashed var(--orange);
-  border-radius: var(--radius);
-  background: var(--peach);
-  font-size: 0.9rem;
-  font-weight: 400;
-  text-align: center;
-  color: var(--muted);
-  transition: background-color var(--dur), border-color var(--dur);
-}
-.dropzone:hover, .dropzone.is-dragover { background: var(--peach-dark); }
-.dropzone:focus-within { outline: 2px solid var(--orange); outline-offset: 3px; }
-.field .dropzone input { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; cursor: pointer; }
-.dropzone .icon { width: 1.75rem; height: 1.75rem; margin-bottom: 0.5rem; color: var(--ink); }
-.dropzone.has-file .dropzone-title { font-weight: 600; color: var(--ink); }
-.field.has-error .dropzone { border-color: var(--error); }
+/* Application form: resumes are emailed instead of uploaded */
+.form-note { color: var(--muted); font-size: 0.9375rem; }
+.form-note a { color: var(--orange); font-weight: 500; transition: color var(--dur); }
+.form-note a:hover { color: var(--orange-dark); }
 
 /* =========================================================
    How it works page
