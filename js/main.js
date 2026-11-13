@@ -1315,16 +1315,16 @@
         message: 'entry.41955298',
       },
     },
-    application: {
-      url: '',
+    application: { // Tutor application (apply-tutor)
+      url: 'https://docs.google.com/forms/d/e/1FAIpQLSf0tswpGOo0NCHoDfkTzRcC4KqZIUpCxGIq0XxTx-q24oTBXw/formResponse',
       fields: {
-        first_name: '',
-        last_name: '',
-        email: '',
-        phone: '',
-        subjects: '',       // all checked subjects, e.g. "Algebra, SAT prep"
-        math_grades: '',    // e.g. "K to 5"
-        reading_grades: '', // e.g. "6 to College"
+        first_name: 'entry.808044195',
+        last_name: 'entry.1382229433',
+        email: 'entry.1584541573',
+        phone: 'entry.1985372643',
+        subjects: 'entry.867968681',       // all checked subjects, e.g. "Algebra, SAT prep"
+        math_grades: 'entry.1103633535',   // e.g. "K to 5"
+        reading_grades: 'entry.1508273640', // e.g. "6 to College"
       },
     },
   };
