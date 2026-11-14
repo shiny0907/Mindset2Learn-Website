@@ -1146,6 +1146,7 @@ main {
   letter-spacing: -0.01em;
 }
 .team-role { margin-top: 0.35rem; color: var(--orange); font-size: 0.9375rem; font-weight: 600; }
+.team-vacant { color: var(--muted); font-weight: 500; }
 .team-cta { margin-top: clamp(4.5rem, 7.5vw, 6.5rem); text-align: center; }
 
 /* Closing call to action */
