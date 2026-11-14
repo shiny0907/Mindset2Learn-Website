@@ -195,24 +195,68 @@
   onScroll();
 
   const menuToggle = document.querySelector('[data-menu-toggle]');
+  const mainNav = document.getElementById('main-nav');
+  // Everything outside the header is made inert while the menu is open, so
+  // taps, Tab and screen readers stay inside the menu
+  const behindMenu = [document.querySelector('main'), document.querySelector('.site-footer'), document.querySelector('.skip-link')].filter(Boolean);
 
-  function closeMenu() {
-    if (!root.classList.contains('menu-open')) return;
-    root.classList.remove('menu-open');
-    menuToggle.setAttribute('aria-expanded', 'false');
-    menuToggle.setAttribute('aria-label', 'Open menu');
-    lenis && lenis.start();
+  function setMenu(open) {
+    root.classList.toggle('menu-open', open);
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    behindMenu.forEach((el) => { el.inert = open; });
+    if (lenis) open ? lenis.stop() : lenis.start();
   }
 
-  if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-      const open = root.classList.toggle('menu-open');
-      menuToggle.setAttribute('aria-expanded', String(open));
-      menuToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-      if (lenis) open ? lenis.stop() : lenis.start();
+  function closeMenu() {
+    if (root.classList.contains('menu-open')) setMenu(false);
+  }
+
+  if (menuToggle && mainNav) {
+    menuToggle.addEventListener('click', () => setMenu(!root.classList.contains('menu-open')));
+
+    // Phones: a round button beside "Tutoring" folds its pages open and shut.
+    // Already open when you're on one of them.
+    const drop = mainNav.querySelector('.nav-drop');
+    const sub = drop && drop.querySelector('.nav-sub');
+    if (drop && sub) {
+      sub.id = 'nav-sub-tutoring';
+      const subToggle = document.createElement('button');
+      subToggle.type = 'button';
+      subToggle.className = 'nav-sub-toggle';
+      subToggle.setAttribute('aria-controls', sub.id);
+      subToggle.setAttribute('aria-label', 'Show tutoring pages');
+      subToggle.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+      sub.before(subToggle);
+      const setSub = (open) => {
+        drop.classList.toggle('is-expanded', open);
+        subToggle.setAttribute('aria-expanded', String(open));
+        subToggle.setAttribute('aria-label', open ? 'Hide tutoring pages' : 'Show tutoring pages');
+      };
+      setSub(!!drop.querySelector('.is-active, .is-current'));
+      subToggle.addEventListener('click', () => setSub(!drop.classList.contains('is-expanded')));
+    }
+
+    // Keep Tab cycling through the header (logo, menu links, close button)
+    document.addEventListener('keydown', (e) => {
+      if (!root.classList.contains('menu-open')) return;
+      if (e.key === 'Escape') {
+        closeMenu();
+        menuToggle.focus();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+      const items = [...header.querySelectorAll('a[href], button')].filter((el) => el.offsetParent !== null && getComputedStyle(el).visibility !== 'hidden');
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
     });
-    document.addEventListener('keydown', (e) => e.key === 'Escape' && closeMenu());
+
     window.addEventListener('resize', () => window.innerWidth > 960 && closeMenu());
+    // Coming back with the Back button can restore the page exactly as it
+    // was left, menu still open; start fresh instead
+    window.addEventListener('pageshow', (e) => e.persisted && closeMenu());
   }
 
   /* ---------------------------------------------------------

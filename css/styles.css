@@ -229,6 +229,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 
 .plain-link { color: inherit; white-space: nowrap; transition: color var(--dur); }
+/* Keeps a word and the punctuation after it on one line (split headings
+   break between every word piece otherwise) */
+.nowrap { white-space: nowrap; }
 .plain-link:hover { color: var(--orange); }
 
 /* ---------- Buttons ---------- */
@@ -340,44 +343,50 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .main-nav a.is-active::after { transform: scaleX(1); }
 
 /* Tutoring dropdown: opens on hover or keyboard focus; "Tutoring" itself
-   still links to the Tutoring page. Phones show the links inline (below). */
-.nav-drop { position: relative; }
-.nav-drop > a { display: inline-flex; align-items: center; gap: 0.3rem; }
-.nav-caret { width: 0.85rem; height: 0.85rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
-.nav-drop:hover .nav-caret,
-.nav-drop:focus-within .nav-caret { transform: rotate(180deg); }
-.nav-sub {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  padding-top: 0.75rem; /* invisible bridge so the menu stays open on the way down */
-  opacity: 0;
-  visibility: hidden;
-  transform: translate(-50%, -0.35rem);
-  transition: opacity 0.2s var(--ease), transform 0.3s var(--ease), visibility 0.2s;
-}
-.nav-drop:hover .nav-sub,
-.nav-drop:focus-within .nav-sub { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-.main-nav .nav-sub ul {
-  display: grid;
-  gap: 0;
-  min-width: 14rem;
-  padding: 0.5rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-.main-nav .nav-sub a {
-  display: block;
-  padding: 0.6rem 0.85rem;
-  border-radius: var(--radius-sm);
-  white-space: nowrap;
-  transition: background-color var(--dur), color var(--dur);
-}
+   still links to the Tutoring page. Desktop only: phones get their own
+   full-screen menu (Responsive, "Mobile menu"). Keeping these rules out of
+   the phone layout matters, because iOS treats a tap as a hover and would
+   otherwise slide the sub-list half its width to the left. */
+.nav-sub-toggle { display: none; } /* added by main.js; phones only */
 .main-nav .nav-sub a::after { display: none; }
-.main-nav .nav-sub a:hover { background: var(--peach); color: var(--orange); }
 .main-nav .nav-sub a.is-current { color: var(--orange); }
+@media (min-width: 961px) {
+  .nav-drop { position: relative; }
+  .nav-drop > a { display: inline-flex; align-items: center; gap: 0.3rem; }
+  .nav-caret { width: 0.85rem; height: 0.85rem; stroke-width: 2.5; transition: transform 0.3s var(--ease); }
+  .nav-drop:hover .nav-caret,
+  .nav-drop:focus-within .nav-caret { transform: rotate(180deg); }
+  .nav-sub {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    padding-top: 0.75rem; /* invisible bridge so the menu stays open on the way down */
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -0.35rem);
+    transition: opacity 0.2s var(--ease), transform 0.3s var(--ease), visibility 0.2s;
+  }
+  .nav-drop:hover .nav-sub,
+  .nav-drop:focus-within .nav-sub { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+  .main-nav .nav-sub ul {
+    display: grid;
+    gap: 0;
+    min-width: 14rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow);
+  }
+  .main-nav .nav-sub a {
+    display: block;
+    padding: 0.6rem 0.85rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    transition: background-color var(--dur), color var(--dur);
+  }
+  .main-nav .nav-sub a:hover { background: var(--peach); color: var(--orange); }
+}
 
 .header-cta { margin-left: 0.5rem; }
 .nav-cta-mobile, .menu-toggle { display: none; }
@@ -985,6 +994,10 @@ main {
   line-height: 1;
   letter-spacing: -0.045em;
 }
+/* Phones: "About Us" spans most of the screen width, like it does on desktop */
+@media (max-width: 560px) {
+  .about-title { font-size: 21vw; }
+}
 .about-intro .container { container-type: inline-size; }
 /* Four fixed lines (see <br>s in the markup); the font scales with the
    content width so the longest line always spans it, at any screen size */
@@ -1469,7 +1482,11 @@ html.subjects-animating { overflow-anchor: none; }
   .teach-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
-  .grade-title { text-align: left; }
+  /* Phones keep the oversized look from desktop: the title scales with the
+     screen (15vw, about 59px on an iPhone) and wraps freely, so the longest
+     word ("foundations") still fits on a 360px screen */
+  .grade-title { text-align: left; font-size: 15vw; text-wrap: balance; }
+  .grade-title br { display: none; }
   .pill-pit { height: 26rem; }
   .pill { padding: 0.5rem 1rem; font-size: 0.875rem; }
 }
@@ -1752,42 +1769,122 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .menu-open .menu-toggle .icon-open { display: none; }
   .menu-open .menu-toggle .icon-close { display: block; }
 
+  /* ---------- Mobile menu ----------
+     Fills the screen below the header. Big display-font links in rows of
+     44px+ (Apple's minimum tap size), Tutoring's pages fold away behind a
+     toggle, and the button sits at the bottom where thumbs reach it. */
+  .menu-open, .menu-open body { overflow: hidden; } /* page behind can't scroll */
+  .menu-open .site-header { background: var(--bg); border-bottom-color: var(--line); box-shadow: none; }
+
   .main-nav {
     position: fixed;
-    inset: var(--header-h) 0 auto 0;
-    display: grid;
-    gap: 1.5rem;
-    padding: 1.5rem var(--gutter) 2rem;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    height: calc(100vh - var(--header-h));
+    height: calc(100dvh - var(--header-h));
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem var(--gutter) max(1.5rem, env(safe-area-inset-bottom));
     background: var(--bg);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 20px 40px -24px rgba(28, 27, 24, 0.35);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-0.75rem);
-    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0.3s;
+    transition: opacity 0.3s var(--ease), visibility 0s 0.3s;
   }
-  .menu-open .main-nav { opacity: 1; visibility: visible; transform: none; }
-  .main-nav ul { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
-  .main-nav a:not(.btn) { font-size: 1.125rem; padding-block: 0.6rem; }
+  .menu-open .main-nav { opacity: 1; visibility: visible; transition: opacity 0.3s var(--ease), visibility 0s; }
+
+  .main-nav ul { display: block; }
+  .main-nav > ul { margin-block: 1rem 2rem; }
+  /* No dividers: big type and space do the separating */
+  .main-nav > ul > li > a:not(.btn) {
+    display: flex;
+    align-items: center;
+    min-height: 4.75rem;
+    padding-block: 0.25rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 11vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
   .main-nav a:not(.btn)::after { display: none; }
-  /* Tutoring sub-pages listed inline, indented under "Tutoring" */
-  .main-nav { max-height: calc(100dvh - var(--header-h)); overflow-y: auto; }
+
+  /* Tutoring row: the word links to the Tutoring page, the round button
+     beside it opens the list of tutoring pages */
+  .nav-drop { display: grid; grid-template-columns: 1fr auto; align-items: center; }
   .nav-caret { display: none; }
-  .nav-drop > a { display: inline; } /* same spacing as the other menu links */
-  .nav-sub { position: static; padding: 0.35rem 0 0.15rem; opacity: 1; visibility: inherit; transform: none; transition: none; }
-  .main-nav .nav-sub ul {
-    min-width: 0;
-    margin-left: 0.15rem;
-    padding: 0 0 0 1rem;
+  .nav-sub-toggle {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
     border: 0;
-    border-left: 2px solid var(--line);
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
+    border-radius: 50%;
+    background: var(--bg-gray);
+    color: var(--ink);
+    transition: background-color var(--dur), transform 0.2s var(--ease);
   }
-  .main-nav .nav-sub a { padding: 0.25rem 0 0.25rem 0.25rem; font-size: 1rem; color: var(--muted); }
-  .main-nav .nav-sub a:hover { background: none; }
-  .nav-cta-mobile { display: inline-flex; }
+  .nav-sub-toggle:active { transform: var(--press); }
+  .nav-sub-toggle .icon { width: 1.25rem; height: 1.25rem; stroke-width: 2.25; transition: transform 0.35s var(--ease); }
+  .nav-drop.is-expanded .nav-sub-toggle { background: var(--peach); color: var(--orange); }
+  .nav-drop.is-expanded .nav-sub-toggle .icon { transform: rotate(180deg); }
+
+  .nav-sub { grid-column: 1 / -1; }
+  /* Folds open with a height animation (0fr → 1fr). Without JS it just
+     stays open. Hidden links can't be tabbed to while it's closed. */
+  .js .nav-sub {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows 0.4s var(--ease), visibility 0s 0.4s;
+  }
+  .js .nav-drop.is-expanded .nav-sub {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 0.4s var(--ease), visibility 0s;
+  }
+  .main-nav .nav-sub ul { min-height: 0; overflow: hidden; }
+  .main-nav .nav-sub li:first-child { padding-top: 0.25rem; }
+  .main-nav .nav-sub li:last-child { padding-bottom: 1rem; }
+  .main-nav .nav-sub a {
+    display: flex;
+    align-items: center;
+    min-height: 3.5rem;
+    font-size: 1.375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--muted);
+  }
+  .main-nav .nav-sub a.is-current { color: var(--orange); }
+
+  .nav-cta-mobile {
+    display: flex;
+    width: 100%;
+    margin-top: auto; /* pinned to the bottom of the screen */
+    padding-block: 1.1rem;
+    font-size: 1.0625rem;
+  }
+
+  /* Rows rise in one after another as the menu opens */
+  .main-nav > ul > li,
+  .nav-cta-mobile {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .menu-open .main-nav > ul > li,
+  .menu-open .nav-cta-mobile {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.45s var(--ease), transform 0.55s var(--ease);
+  }
+  .menu-open .main-nav > ul > li:nth-child(2) { transition-delay: 0.04s; }
+  .menu-open .main-nav > ul > li:nth-child(3) { transition-delay: 0.08s; }
+  .menu-open .main-nav > ul > li:nth-child(4) { transition-delay: 0.12s; }
+  .menu-open .main-nav > ul > li:nth-child(5) { transition-delay: 0.16s; }
+  .menu-open .nav-cta-mobile { transition-delay: 0.2s; }
 
   .hero-grid,
   .approach-grid,
@@ -1841,6 +1938,8 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .hero-title br, .about-cta br { display: none; }
+  /* Same oversized phone headline as the tutoring pages (.grade-title) */
+  .hero-title { font-size: 15vw; line-height: 1; letter-spacing: -0.04em; text-wrap: balance; }
 }
 
 @media (prefers-reduced-motion: reduce) {
