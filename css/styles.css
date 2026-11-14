@@ -338,7 +338,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
   transform: scaleX(0);
   transition: transform 0.3s var(--ease);
 }
-.main-nav a:not(.btn):hover { color: var(--orange); }
+/* Hover only with a real mouse: phones (and phone previews) treat a tap as
+   a hover, which would leave the tapped link stuck orange */
+@media (hover: hover) and (pointer: fine) {
+  .main-nav a:not(.btn):hover { color: var(--orange); }
+}
 .main-nav a.is-active { color: var(--orange); }
 .main-nav a.is-active::after { transform: scaleX(1); }
 
@@ -1763,7 +1767,9 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
     background: var(--bg-gray);
     transition: background-color var(--dur), transform 0.25s var(--ease);
   }
-  .menu-toggle:hover { background: var(--bg-gray-dark); transform: var(--grow); }
+  @media (hover: hover) and (pointer: fine) {
+    .menu-toggle:hover { background: var(--bg-gray-dark); transform: var(--grow); }
+  }
   .menu-toggle:active { transform: var(--press); }
   .menu-toggle .icon-close { display: none; }
   .menu-open .menu-toggle .icon-open { display: none; }

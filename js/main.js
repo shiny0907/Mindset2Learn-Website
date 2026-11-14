@@ -213,6 +213,10 @@
   }
 
   if (menuToggle && mainNav) {
+    // Lenis is stopped while the menu is open and then swallows every wheel
+    // and swipe, which would also stop a long menu (Tutoring open) from
+    // scrolling. This tells Lenis to leave scrolling inside the menu alone.
+    mainNav.setAttribute('data-lenis-prevent', '');
     menuToggle.addEventListener('click', () => setMenu(!root.classList.contains('menu-open')));
 
     // Phones: a round button beside "Tutoring" folds its pages open and shut.
