@@ -606,12 +606,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
   align-items: center;
   gap: var(--gap-cols);
 }
-.approach-media {
-  aspect-ratio: 4 / 4.9;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-}
-.approach-media img { object-position: 72% center; }
+/* Photo carousel; reuses the hero slider (.hero-slides / .hero-slide) */
+.approach-slides { aspect-ratio: 4 / 4.9; }
+.approach-slides .hero-slide img { object-position: center; }
 .approach-copy .section-sub { max-width: 40rem; }
 
 .pillars {
@@ -1900,7 +1897,7 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .grade-grid { grid-template-columns: 1fr; }
   .grade-card .card-title { max-width: none; }
   .wide-card { padding: 1.5rem; }
-  .approach-media { max-width: 30rem; aspect-ratio: 4 / 3.6; }
+  .approach-media { justify-self: center; width: 100%; max-width: 30rem; }
   .faq-head { position: static; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; }

@@ -850,10 +850,9 @@
   }
 
   /* ---------------------------------------------------------
-     Hero slider
+     Photo sliders (hero + Our approach)
      --------------------------------------------------------- */
-  const hero = document.querySelector('[data-hero-slider]');
-  if (hero) {
+  document.querySelectorAll('[data-hero-slider]').forEach((hero) => {
     const slides = [...hero.querySelectorAll('.hero-slide')];
     const n = slides.length;
     const DURATION = 1000;    // normal transition
@@ -936,7 +935,7 @@
 
     hero.querySelector('[data-prev]').addEventListener('click', () => { go(-1); restart(); });
     hero.querySelector('[data-next]').addEventListener('click', () => { go(1); restart(); });
-  }
+  });
 
   /* ---------------------------------------------------------
      Testimonial carousel
