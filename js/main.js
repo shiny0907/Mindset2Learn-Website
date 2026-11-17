@@ -219,27 +219,28 @@
     mainNav.setAttribute('data-lenis-prevent', '');
     menuToggle.addEventListener('click', () => setMenu(!root.classList.contains('menu-open')));
 
-    // Phones: a round button beside "Tutoring" folds its pages open and shut.
-    // Already open when you're on one of them.
-    const drop = mainNav.querySelector('.nav-drop');
-    const sub = drop && drop.querySelector('.nav-sub');
-    if (drop && sub) {
-      sub.id = 'nav-sub-tutoring';
+    // Phones: a round button beside each dropdown ("Tutoring", "About Us")
+    // folds its pages open and shut. Already open when you're on one of them.
+    mainNav.querySelectorAll('.nav-drop').forEach((drop, i) => {
+      const sub = drop.querySelector('.nav-sub');
+      const top = drop.querySelector(':scope > a');
+      if (!sub || !top) return;
+      const name = top.textContent.trim();
+      sub.id = `nav-sub-${i}`;
       const subToggle = document.createElement('button');
       subToggle.type = 'button';
       subToggle.className = 'nav-sub-toggle';
       subToggle.setAttribute('aria-controls', sub.id);
-      subToggle.setAttribute('aria-label', 'Show tutoring pages');
       subToggle.innerHTML = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
       sub.before(subToggle);
       const setSub = (open) => {
         drop.classList.toggle('is-expanded', open);
         subToggle.setAttribute('aria-expanded', String(open));
-        subToggle.setAttribute('aria-label', open ? 'Hide tutoring pages' : 'Show tutoring pages');
+        subToggle.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} ${name} pages`);
       };
       setSub(!!drop.querySelector('.is-active, .is-current'));
       subToggle.addEventListener('click', () => setSub(!drop.classList.contains('is-expanded')));
-    }
+    });
 
     // Keep Tab cycling through the header (logo, menu links, close button)
     document.addEventListener('keydown', (e) => {

@@ -1776,6 +1776,14 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .header-inner { gap: 1.5rem; }
   .t-text { font-size: 1.05rem; }
 }
+/* Narrowest laptops: six links + the button only just fit, so tighten up
+   and keep each link on one line */
+@media (min-width: 961px) and (max-width: 1100px) {
+  .main-nav a:not(.btn) { white-space: nowrap; }
+  .main-nav ul { gap: 1.1rem; }
+  .header-inner { gap: 1rem; }
+  .header-cta { margin-left: 0; padding-inline: 1.25rem; }
+}
 
 /* Tablets & mobile: collapse navigation */
 @media (max-width: 960px) {
