@@ -1352,7 +1352,7 @@
      Both come from the Google Form's "Get pre-filled link". Leave url empty
      and visitors are asked to call or email instead. */
   const GOOGLE_FORMS = {
-    assessment: { // "Book a Free Assessment" (Home, Book, How It Works)
+    assessment: { // "Get Started" form (Home, Book, How It Works)
       url: 'https://docs.google.com/forms/d/e/1FAIpQLSfCB-zdqRTgq_osfSg02QqevmvdyEl_eTHWEfWdFxSHosFqvA/formResponse',
       fields: {
         first_name: 'entry.192635986',

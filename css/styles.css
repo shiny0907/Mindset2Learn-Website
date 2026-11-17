@@ -1526,7 +1526,7 @@ html.subjects-animating { overflow-anchor: none; }
 .subject-body .subject-link { justify-self: start; align-self: auto; margin-top: 1.6rem; padding-top: 0; }
 
 /* =========================================================
-   Book a free assessment page (just the form panel)
+   Get Started page (just the form panel)
    ========================================================= */
 /* The panel has its own padding, so it only needs a small gap under the header */
 .book { padding-block: clamp(1rem, 2.5vw, 2rem) var(--section-y); }
