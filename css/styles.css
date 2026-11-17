@@ -776,12 +776,19 @@ html.faq-animating { overflow-anchor: none; }
 .faq-icon { width: 1.35rem; height: 1.35rem; transition: transform 0.4s var(--ease), color var(--dur); }
 .faq-item.is-open .faq-icon { transform: rotate(135deg); }
 
+/* Closed answers are also hidden (after the close animation), so nothing
+   inside can be tabbed to or tapped. Same as the subject list. */
 .faq-a {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s var(--ease);
+  visibility: hidden;
+  transition: grid-template-rows 0.45s var(--ease), visibility 0s 0.45s;
 }
-.faq-item.is-open .faq-a { grid-template-rows: 1fr; }
+.faq-item.is-open .faq-a {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.45s var(--ease), visibility 0s;
+}
 .faq-a-inner { overflow: hidden; }
 .faq-a p {
   padding: 1.25rem 1.5rem 1.5rem;
@@ -994,10 +1001,6 @@ main {
   font-size: clamp(4rem, 9vw, 8.5rem);
   line-height: 1;
   letter-spacing: -0.045em;
-}
-/* Phones: "About Us" spans most of the screen width, like it does on desktop */
-@media (max-width: 560px) {
-  .about-title { font-size: 21vw; }
 }
 .about-intro .container { container-type: inline-size; }
 /* Four fixed lines (see <br>s in the markup); the font scales with the
@@ -1338,12 +1341,19 @@ html.subjects-animating { overflow-anchor: none; }
 .subject.is-open .subject-icon { color: var(--orange); }
 .subject.is-open .subject-icon { transform: rotate(135deg); }
 
+/* Closed rows are also hidden (after the close animation), so links inside
+   them can't be tabbed to or tapped while closed */
 .subject-a {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.45s var(--ease);
+  visibility: hidden;
+  transition: grid-template-rows 0.45s var(--ease), visibility 0s 0.45s;
 }
-.subject.is-open .subject-a { grid-template-rows: 1fr; }
+.subject.is-open .subject-a {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows 0.45s var(--ease), visibility 0s;
+}
 .subject-a-inner { overflow: hidden; }
 .subject-body {
   display: grid;
@@ -1881,9 +1891,12 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
     visibility: hidden;
     transition: grid-template-rows 0.4s var(--ease), visibility 0s 0.4s;
   }
+  /* "inherit", not "visible": the menu itself is hidden while closed, and
+     "visible" here overrode that, leaving these links invisible but still
+     tappable on top of the page (Tutoring pages start with this open) */
   .js .nav-drop.is-expanded .nav-sub {
     grid-template-rows: 1fr;
-    visibility: visible;
+    visibility: inherit;
     transition: grid-template-rows 0.4s var(--ease), visibility 0s;
   }
   .main-nav .nav-sub ul { min-height: 0; overflow: hidden; }
@@ -1978,9 +1991,13 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
   .wide-card { grid-template-columns: 1fr; }
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
-  .hero-title br, .about-cta br { display: none; }
-  /* Same oversized phone headline as the tutoring pages (.grade-title) */
-  .hero-title { font-size: 15vw; line-height: 1; letter-spacing: -0.04em; text-wrap: balance; }
+  .hero-title br, .about-cta br, .page-title br { display: none; }
+  /* One phone headline size for every page's main heading: Home, the
+     tutoring pages (.grade-title), About Us, and the inner pages
+     (Tutoring, How It Works, Newsletter, Careers, the job page) */
+  .hero-title,
+  .page-title,
+  .about-title { font-size: 15vw; line-height: 1; letter-spacing: -0.04em; text-wrap: balance; }
 }
 
 @media (prefers-reduced-motion: reduce) {
