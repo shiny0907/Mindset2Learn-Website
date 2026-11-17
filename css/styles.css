@@ -1811,7 +1811,10 @@ fieldset.field legend { margin-bottom: 0.6rem; padding: 0; font-size: 0.875rem; 
      Fills the screen below the header. Big display-font links in rows of
      44px+ (Apple's minimum tap size), Tutoring's pages fold away behind a
      toggle, and the button sits at the bottom where thumbs reach it. */
-  .menu-open, .menu-open body { overflow: hidden; } /* page behind can't scroll */
+  /* Page behind can't scroll. Only on <html>: also hiding overflow on <body>
+     turns it into the scroll box for the sticky header, which then jumps
+     back to the top of the page (off screen) and takes the menu with it. */
+  .menu-open { overflow: hidden; }
   .menu-open .site-header { background: var(--bg); border-bottom-color: var(--line); box-shadow: none; }
 
   .main-nav {
